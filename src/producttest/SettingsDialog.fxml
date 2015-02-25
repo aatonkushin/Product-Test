@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="producttest.SettingsDialogController">
+   <children>
+      <VBox layoutX="14.0" layoutY="14.0">
+         <children>
+            <HBox prefWidth="200.0" />
+            <HBox prefWidth="200.0" />
+            <HBox prefWidth="200.0" />
+            <GridPane>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="281.0" minWidth="10.0" prefWidth="149.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="423.0" minWidth="10.0" prefWidth="423.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label text="Строка подключения:" />
+                  <Label text="Имя пользователя:" GridPane.rowIndex="1" />
+                  <Label text="Пароль:" GridPane.rowIndex="2" />
+                  <TextField fx:id="txtConnectionString" promptText="Например: jdbc:oracle:thin:@192.168.10.41:1521:xe" GridPane.columnIndex="1" />
+                  <TextField fx:id="txtUsername" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <PasswordField fx:id="txtPassword" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                     <children>
+                        <Button fx:id="btnOk" mnemonicParsing="false" onAction="#btnOkOnAction" prefWidth="58.0" text="ОК">
+                           <HBox.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </HBox.margin>
+                        </Button>
+                        <Button fx:id="btnCancel" mnemonicParsing="false" onAction="#btnCancelOnAction" text="Отмена">
+                           <HBox.margin>
+                              <Insets bottom="5.0" left="5.0" top="5.0" />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                     <children>
+                        <Button fx:id="btnTest" mnemonicParsing="false" onAction="#btnTestOnAction" prefWidth="58.0" text="Тест" />
+                        <Label fx:id="lblStatus" text="Состояние...">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <Label text="Фильтр по профессиям:" GridPane.rowIndex="4" />
+                  <TextField fx:id="txtFilterPersonal" promptText="Например: 'Лаборант', 'Техник-лаборант', 'Инженер-лаборант'" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="10.0" right="10.0" />
+               </VBox.margin>
+            </GridPane>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

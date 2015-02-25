@@ -1,0 +1,9 @@
+.custom-label {
+  -fx-font-size: 70%;
+  -fx-vertical-align: top;
+}
+
+.subscript-label {
+  -fx-font-size: 70%;
+  -fx-vertical-align: bottom;
+}
