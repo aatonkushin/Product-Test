@@ -34,6 +34,8 @@ import producttest.model.Result;
 import producttest.model.SampleTest;
 import producttest.model.SampleType;
 import producttest.model.TestReport;
+import producttest.model.Product;
+import producttest.model.Stat;
 
 /**
  *
@@ -49,6 +51,12 @@ public class BLogic {
     private ObservableList<Result> results; //Результаты испытаний.
     private ObservableList<Person> personal; //Список сотрудников-лаборантов.
     private ObservableList<String> positions; //Позиции испытуемых образцов в массиве.
+    private ObservableList<Product> products; //Продукция.
+    private ObservableList<String> months;    //Месяцы в году.
+    private ObservableList<Integer> years;    //Годы.
+    private ObservableList<String> densityMarks; //Марки по плотности.
+    private ObservableList<String> durabilityMarks; //Марки по прочности.
+    private ObservableList<Stat> productTestStatistics; //Статистика испытаний ГП.
 
     //Срядняя плотность во влажном состоянии.
     private DoubleProperty avgWetDensity;
@@ -331,7 +339,7 @@ public class BLogic {
             setAddMeasureName2("");
             setAddMeasureValue2(0d);
             setAddMeasureUnit2("");
-            
+
             setApplyRatios(Boolean.FALSE);
 
             //Если контекст данных не пустой, 
@@ -459,7 +467,7 @@ public class BLogic {
                     setAddMeasureName2(testReport.getAddMeasureName2() != null ? "" : testReport.getAddMeasureName2());
                     setAddMeasureValue2(testReport.getAddMeasureValue2());
                     setAddMeasureUnit2(testReport.getAddMeasureUnit2() != null ? "" : testReport.getAddMeasureUnit2());
-                    
+
                     //Устанавливаем флаг "Принять текущие коэффициенты вариации"
                     this.setApplyRatios(testReport.getApplyRatios());
 
@@ -641,26 +649,125 @@ public class BLogic {
 
     //Применить текущие коэффициенты вариации.
     private BooleanProperty applyRatios;
-    public final Boolean getApplyRatios(){
+
+    public final Boolean getApplyRatios() {
         return this.applyRatios.get();
     }
-    public final void setApplyRatios(Boolean apply){
+
+    public final void setApplyRatios(Boolean apply) {
         this.applyRatios.set(apply);
     }
-    public BooleanProperty applyRatiosProperty(){
+
+    public BooleanProperty applyRatiosProperty() {
         return this.applyRatios;
     }
-    
-    public ObservableList<String> getPositions(){
+
+    public ObservableList<String> getPositions() {
         return this.positions;
     }
-    
-    public void setPositions(ObservableList<String> positions){
+
+    public void setPositions(ObservableList<String> positions) {
         this.positions = positions;
+    }
+
+    //---------------------------------
+    //Продукция.
+    /**
+     * @return the products
+     */
+    public ObservableList<Product> getProducts() {
+        return products;
+    }
+
+    /**
+     * @param products the products to set
+     */
+    public void setProducts(ObservableList<Product> products) {
+        this.products = products;
+    }
+
+    //---------------------------------
+    //Месяцы
+
+    /**
+     * @return the months
+     */
+    public ObservableList<String> getMonths() {
+        return months;
+    }
+
+    /**
+     * @param months the months to set
+     */
+    public void setMonths(ObservableList<String> months) {
+        this.months = months;
+    }
+
+    //---------------------------------
+    //Годы
+
+    /**
+     * @return the years
+     */
+    public ObservableList<Integer> getYears() {
+        return years;
+    }
+
+    /**
+     * @param years the years to set
+     */
+    public void setYears(ObservableList<Integer> years) {
+        this.years = years;
+    }
+    //---------------------------------
+    //Плотности
+        /**
+     * @return the densityMarks
+     */
+    public ObservableList<String> getDensityMarks() {
+        return densityMarks;
+    }
+
+    /**
+     * @param densityMarks the densityMarks to set
+     */
+    public void setDensityMarks(ObservableList<String> densityMarks) {
+        this.densityMarks = densityMarks;
     }
     
     //---------------------------------
+    //Марки по прочности.
+    /**
+     * @return the durabilityMarks
+     */
+    public ObservableList<String> getDurabilityMarks() {
+        return durabilityMarks;
+    }
+
+    /**
+     * @param durabilityMarks the durabilityMarks to set
+     */
+    public void setDurabilityMarks(ObservableList<String> durabilityMarks) {
+        this.durabilityMarks = durabilityMarks;
+    }
+    //--------------------------------------------------------------------------
+    //Статистика испытаний ГП.
+        /**
+     * @return the productTestStatistics
+     */
+    public ObservableList<Stat> getProductTestStatistics() {
+        return productTestStatistics;
+    }
+
+    /**
+     * @param productTestStatistics the productTestStatistics to set
+     */
+    public void setProductTestStatistics(ObservableList<Stat> productTestStatistics) {
+        this.productTestStatistics = productTestStatistics;
+    }
+    
 //</editor-fold>
+
     public BLogic() {
         this.additionalMeasures = FXCollections.observableArrayList("Прочность на изгиб", "Теплопроводность", "Морозостойкость", "Усадка");
         this.positions = FXCollections.observableArrayList("к. верх", "к. середина", "к. низ", "с. верх", "с. середина", "с. низ");
@@ -691,6 +798,16 @@ public class BLogic {
         addMeasureName2 = new SimpleStringProperty();
         addMeasureValue2 = new SimpleDoubleProperty();
         addMeasureUnit2 = new SimpleStringProperty();
+
+        //---
+        products = FXCollections.observableArrayList();
+        months = FXCollections.observableArrayList("", "Январь", "Февраль", "Март",
+                "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь",
+                "Ноябрь", "Декабрь");
+        years = FXCollections.observableArrayList();
+        for (int i = 2010; i < 2050; i++) {
+            years.add(i);
+        }
 
         //Отслеживаем изменение средней сухой плотности 
         //и по ней выставляем марку по плотности, а также расчитываем текущий
@@ -920,12 +1037,12 @@ public class BLogic {
     public boolean AddNewSampleTest() {
         SampleTest newTest = new SampleTest();
         newTest.setSampleNum(sampleTests.size() + 1);   //Устанавливаем номер по порядку
-        
+
         //Устанавливаем расположение образца в массиве.
         if (sampleTests.size() < positions.size()) {
             newTest.setPosition(positions.get(sampleTests.size()));
         }
-        
+
         return sampleTests.add(newTest);
     }
 
@@ -966,6 +1083,16 @@ public class BLogic {
             dc.connect();
             partNumbers = FXCollections.observableArrayList(dc.GetPartNumbers());
             personal = FXCollections.observableArrayList(dc.GetPersonal());
+            products = FXCollections.observableArrayList(dc.getProducts());
+            products.set(0, new Product());
+            
+            densityMarks = FXCollections.observableArrayList(dc.getDensityMarks());
+            densityMarks.set(0, "");
+            
+            durabilityMarks = FXCollections.observableArrayList(dc.getDurabilityMarks());
+            durabilityMarks.set(0, "");
+            
+            productTestStatistics = FXCollections.observableArrayList(dc.getProductTestStatistics());
         } catch (SQLRecoverableException ex) {
             Logger.getLogger(BLogic.class.getName()).log(Level.SEVERE, null, ex);
             infoMessage.set(ex.getLocalizedMessage());
@@ -995,10 +1122,10 @@ public class BLogic {
 
         Date dt;
         DateFormat df;
-        try{
-        df = new SimpleDateFormat("dd.MM.yyyy");
-        dt = df.parse(getSelectedTestDate());}
-        catch(ParseException ex){
+        try {
+            df = new SimpleDateFormat("dd.MM.yyyy");
+            dt = df.parse(getSelectedTestDate());
+        } catch (ParseException ex) {
             setInfoMessage("Не правильно указана дата! Данные не сохранены.");
             infoMessage.set(ex.getLocalizedMessage());
             return;

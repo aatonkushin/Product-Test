@@ -24,6 +24,8 @@ import producttest.model.Part;
 import producttest.model.Person;
 import producttest.model.SampleTest;
 import producttest.model.TestReport;
+import producttest.model.Product;
+import producttest.model.Stat;
 
 /**
  * Класс доступа к данным.
@@ -34,7 +36,7 @@ public class DataContext {
 
     //
     OracleDataSource dataSource;
-    
+
     //Настройки.
     Config cfg;
 
@@ -60,16 +62,17 @@ public class DataContext {
      */
     public DataContext() {
         //пробуем считать настройки изфайла.
-        try{
-            
-        } catch(Exception ex){
-            System.out.println("Ошибка при загрузке настроек: "+ex.toString());
+        try {
+
+        } catch (Exception ex) {
+            System.out.println("Ошибка при загрузке настроек: " + ex.toString());
         }
         cfg = new Config();
         cfg.readPropertiesFromFile();
-        
-        if (cfg.getConnectionString() != null)
+
+        if (cfg.getConnectionString() != null) {
             url = cfg.getConnectionString();
+        }
         if (cfg.getUsername() != null) {
             username = cfg.getUsername();
         }
@@ -107,17 +110,16 @@ public class DataContext {
                 + "T_Q_CUTTING.PRODUCT_ID = T_PRODUCT.ID(+) ORDER BY DATE_TIME DESC, PART_NO DESC";
 
         //System.out.println("\nExecuting query: " + query);
-
         try (ResultSet rset = stmt.executeQuery(query)) {
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            
+
             int n = 0;
             while (rset.next()) {
                 Date dt = df.parse(rset.getString(1).substring(0, 10));
                 retVal.add(new Part(rset.getString(2), dt, rset.getString(4), rset.getInt(3)));
                 n++;
             }
-            
+
             //System.out.println("\nLoaded: " + n);
         }
         return retVal;
@@ -134,12 +136,11 @@ public class DataContext {
         if (connection == null) {
             return retVal;
         }
-        
+
         //String filter = " and prof.name IN ('Лаборант', 'Техник-лаборант', 'Главный технолог', 'Инженер-лаборант', 'Начальник лаборатории по контролю производства') ";
-        
         String filter = "";
         if (cfg.getFilterPersonal() != null && !cfg.getFilterPersonal().equals("")) {
-            filter = " and prof.name IN ("+cfg.getFilterPersonal()+") ";
+            filter = " and prof.name IN (" + cfg.getFilterPersonal() + ") ";
         }
 
         Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -198,7 +199,7 @@ public class DataContext {
         if (connection == null) {
             return 0;
         }
-        
+
         int applyRatiosInt = 0;
         if (applyRatios) {
             applyRatiosInt = 1;
@@ -258,7 +259,7 @@ public class DataContext {
             stmt.execute(query);
 
             rset.close();
-            
+
             return 1;
         }
     }
@@ -327,9 +328,8 @@ public class DataContext {
                     weight, destructLoad, wetDensity, dryDensity, durability);
 
             //System.out.println("\nInserting: " + query);
-
             rset.close();
-            
+
             stmt.execute(query);
             return 1;
         }
@@ -368,7 +368,6 @@ public class DataContext {
                     + "VALUES (%d, %d, %f, %f, %f, %f)", testId, bottleNum, bottleWeight, wetWeight, dryWeight, humidity);
 
             //System.out.println("\nInserting: " + query);
-
             stmt.execute(query);
 
             return 1;
@@ -423,7 +422,6 @@ public class DataContext {
                 + "FROM T_Q_ST WHERE PART_NO='%s' AND PART_DATE =TO_DATE('%s','DD.MM.YYYY')", part.getPartNum(), df.format(part.getDateTime()));
 
         //System.out.println("\nExecuting query: " + query);
-
         try (ResultSet rset = stmt.executeQuery(query)) {
             if (rset.next()) {
                 retVal = new TestReport();
@@ -436,7 +434,7 @@ public class DataContext {
                 retVal.setSampleType(rset.getString(7));
                 retVal.setReqDensity(rset.getDouble(8));
                 retVal.setReqDurability(rset.getDouble(9));
-                
+
                 retVal.setAvgWetDensity(rset.getDouble(10));
                 retVal.setAvgDryDensity(rset.getDouble(11));
                 retVal.setDensityMark(rset.getString(12));
@@ -444,14 +442,14 @@ public class DataContext {
                 retVal.setAvgDurability(rset.getDouble(14));
                 retVal.setDurabilityMark(rset.getString(15));
                 retVal.setDurabilityVariation(rset.getDouble(16));
-                
+
                 retVal.setAddMeasureName1(rset.getString(17));
                 retVal.setAddMeasureValue1(rset.getDouble(18));
                 retVal.setAddMeasureUnit1(rset.getString(19));
                 retVal.setAddMeasureName2(rset.getString(20));
                 retVal.setAddMeasureValue2(rset.getDouble(21));
                 retVal.setAddMeasureUnit2(rset.getString(22));
-                
+
                 retVal.setApplyRatios(rset.getBoolean(23));
             }
         }
@@ -479,7 +477,6 @@ public class DataContext {
                 + "FROM T_Q_ST_HUMIDITY WHERE T_Q_ST_ID = %d", tr.getId());
 
         //System.out.println("\nExecuting query: " + query);
-
         try (ResultSet rset = stmt.executeQuery(query)) {
             while (rset.next()) {
                 HumidityTest ht = new HumidityTest();
@@ -491,7 +488,7 @@ public class DataContext {
                 retVal.add(ht);
             }
         }
-        
+
         return retVal;
     }
 
@@ -515,8 +512,7 @@ public class DataContext {
                 + "DESTRUCT_LOAD FROM T_Q_ST_DETAILS WHERE T_Q_ST_ID = %d",
                 tr.getId());
 
-       // System.out.println("\nExecuting query: " + query);
-
+        // System.out.println("\nExecuting query: " + query);
         try (ResultSet rset = stmt.executeQuery(query)) {
             while (rset.next()) {
                 SampleTest st = new SampleTest();
@@ -528,54 +524,57 @@ public class DataContext {
                 st.setHeight(rset.getDouble(7));
                 st.setWeight(rset.getDouble(8));
                 st.setDestructLoad(rset.getDouble(9));
-                
+
                 retVal.add(st);
             }
         }
-        
+
         return retVal;
     }
 
     /**
-     * Получает из БД коэффициенты вариации по плотности за 30 дней от указанной даты для указанной продукции.
+     * Получает из БД коэффициенты вариации по плотности за 30 дней от указанной
+     * даты для указанной продукции.
+     *
      * @param dt - дата, начиная от которой получаем вариации.
-     * @param productId - продукция, для плотности которой получаем коэфициенты вариации.
+     * @param productId - продукция, для плотности которой получаем коэфициенты
+     * вариации.
      * @return список коэффициентов вариации.
      * @throws SQLException
      * @throws java.text.ParseException
      */
     public ArrayList<Double> getDensityVariationsByDateAndProduct(String dt, int productId) throws SQLException, ParseException {
-         if (connection == null) {
+        if (connection == null) {
             return null;
         }
-         
+
         ArrayList<Double> retVal = new ArrayList<>();   //Возвращаемое значение.
-        
+
         if (dt.equals("")) {
             return retVal;
         }
-        
+
         int density = this.getDensityByProductId(productId); //Плотность продукции, для которой выбираем коэффициенты вариации.
-        
+
         //Сначала смотрим плотность продукции
         if (density <= 0) {
             return retVal;
         }
-        
+
         //Выбираем начальную и конечную дату предыдущего месяца.
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         Date d = df.parse(dt);
-        
+
         Calendar start = new GregorianCalendar();
         start.setTime(d);
         start.add(Calendar.MONTH, -1);
         start.set(Calendar.DAY_OF_MONTH, 1);
-        
+
         Calendar end = new GregorianCalendar();
         end.setTime(d);
         end.add(Calendar.MONTH, -1);
         end.set(Calendar.DAY_OF_MONTH, end.getMaximum(Calendar.DAY_OF_MONTH));
-        
+
         //Затем получаем 30 результатов за последние 30 дней.
         Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
         String query = String.format("SELECT DENSITY_VARIATION variation "
@@ -583,52 +582,52 @@ public class DataContext {
                 + "WHERE T_Q_ST.PRODUCT_ID = T_PRODUCT.ID and T_PRODUCT.DENSITY = %d "
                 + "and T_Q_ST.TEST_DATE BETWEEN TO_DATE('%s', 'dd.MM.YYYY') AND TO_DATE('%s', 'dd.MM.YYYY') and rownum < 31 AND APPLY_RATIOS = 1 "
                 + "order by T_Q_ST.PART_DATE DESC",
-                density , df.format(start.getTime()), df.format(end.getTime()));
+                density, df.format(start.getTime()), df.format(end.getTime()));
 
-       //System.out.println("\nExecuting query: " + query);
-
+        //System.out.println("\nExecuting query: " + query);
         try (ResultSet rset = stmt.executeQuery(query)) {
             while (rset.next()) {
                 retVal.add(rset.getDouble(1));
             }
         }
-        
+
         return retVal;
     }
-    
+
     /**
      * Возвращает из БД коэффициенты вариации за последний месмяц.
+     *
      * @param dt - дата от которой отсчитывается месяц.
      * @param productId - код продукции для получения плотности.
      * @return Список коэффициентов вариации за последний месмяц.
      * @throws SQLException
      * @throws java.text.ParseException
      */
-    public ArrayList<Double> getDurabilityVariationsByDateAndProduct(String dt, int productId) throws SQLException, ParseException{
+    public ArrayList<Double> getDurabilityVariationsByDateAndProduct(String dt, int productId) throws SQLException, ParseException {
         if (connection == null) {
             return null;
         }
-         
+
         ArrayList<Double> retVal = new ArrayList<>();   //Возвращаемое значение.
-        
+
         if (dt.equals("")) {
             return retVal;
         }
-        
+
         //Выбираем начальную и конечную дату предыдущего месяца.
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         Date d = df.parse(dt);
-        
+
         Calendar start = new GregorianCalendar();
         start.setTime(d);
         start.add(Calendar.MONTH, -1);
         start.set(Calendar.DAY_OF_MONTH, 1);
-        
+
         Calendar end = new GregorianCalendar();
         end.setTime(d);
         end.add(Calendar.MONTH, -1);
         end.set(Calendar.DAY_OF_MONTH, end.getMaximum(Calendar.DAY_OF_MONTH));
-        
+
         int density = this.getDensityByProductId(productId); //Плотность продукции, для которой выбираем коэффициенты вариации.
         //Затем получаем 30 результатов за последние 30 дней.
         Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -640,49 +639,197 @@ public class DataContext {
                 density, df.format(start.getTime()), df.format(end.getTime()));
 
         //System.out.println("\nExecuting query: " + query);
-
         try (ResultSet rset = stmt.executeQuery(query)) {
             while (rset.next()) {
                 retVal.add(rset.getDouble(1));
             }
         }
-        
+
         return retVal;
     }
-    
+
+    /**
+     * Возвращает список с продукцией.
+     *
+     * @return
+     */
+    public ArrayList<Product> getProducts() throws SQLException {
+        if (connection == null) {
+            return null;
+        }
+
+        ArrayList<Product> retVal = new ArrayList<>();   //Возвращаемое значение.
+
+        Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+        String query = "SELECT id, name, density FROM T_PRODUCT order by name";
+
+        //System.out.println("\nExecuting query: " + query);
+        try (ResultSet rset = stmt.executeQuery(query)) {
+            while (rset.next()) {
+                Product p = new Product();
+                p.setId(rset.getInt("id"));
+                p.setName(rset.getString("name"));
+                p.setDensity(rset.getInt("density"));
+                retVal.add(p);
+            }
+        }
+
+        return retVal;
+    }
+
+    //--------------------------------------------------------------------------
+    /**
+     * Возвращает все марки по плотности.
+     *
+     * @return
+     * @throws SQLException
+     */
+    public ArrayList<String> getDensityMarks() throws SQLException {
+        if (connection == null) {
+            return null;
+        }
+
+        ArrayList<String> retVal = new ArrayList<>();   //Возвращаемое значение.
+
+        Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+        String query = "SELECT DISTINCT(DENSITY_MARK) AS DM FROM T_Q_ST WHERE DENSITY_MARK IS NOT NULL ORDER BY DENSITY_MARK";
+
+        try (ResultSet rset = stmt.executeQuery(query)) {
+            while (rset.next()) {
+                retVal.add(rset.getString("DM"));
+            }
+        }
+
+        return retVal;
+    }
+
+    //--------------------------------------------------------------------------
+    /**
+     * Возвращает все марки по прочности.
+     *
+     * @return
+     * @throws SQLException
+     */
+    public ArrayList<String> getDurabilityMarks() throws SQLException {
+        if (connection == null) {
+            return null;
+        }
+
+        ArrayList<String> retVal = new ArrayList<>();   //Возвращаемое значение.
+
+        Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+        String query = "SELECT DISTINCT(DURABILITY_MARK) DM from t_q_st WHERE DURABILITY_MARK is not null ORDER BY DURABILITY_MARK";
+
+        try (ResultSet rset = stmt.executeQuery(query)) {
+            while (rset.next()) {
+                retVal.add(rset.getString("DM"));
+            }
+        }
+
+        return retVal;
+    }
+
+    public ArrayList<Stat> getProductTestStatistics() throws SQLException, ParseException {
+        if (connection == null) {
+            return null;
+        }
+
+        ArrayList<Stat> retVal = new ArrayList<>();   //Возвращаемое значение.
+
+        Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+        String query = "SELECT T_Q_ST.ID,\n"
+                + "  T_Q_ST.PART_NO,\n"
+                + "  T_Q_ST.PRODUCT_ID,\n"
+                + "  T_PRODUCT.NAME PRODUCT_NAME,\n"
+                + "  TO_CHAR(T_Q_ST.PART_DATE, 'dd.mm.yyyy') PART_DATE,\n"
+                + "  TO_CHAR(T_Q_ST.TEST_DATE, 'dd.mm.yyyy') TEST_DATE,\n"
+                + "  T_Q_ST.PERSON_ID,\n"
+                + "  T_PERSONAL.NAME PERSON_NAME,\n"
+                + "  T_Q_ST.SAMPLE_TYPE,\n"
+                + "  T_Q_ST.REQ_DENSITY,\n"
+                + "  ROUND(T_Q_ST.REQ_DURABILITY, 0) REQ_DURABILITY,\n"
+                + "  T_Q_ST.AVG_WET_DENSITY,\n"
+                + "  ROUND(T_Q_ST.AVG_DRY_DENSITY, 0) AVG_DRY_DENSITY,\n"
+                + "  T_Q_ST.DENSITY_MARK,\n"
+                + "  T_Q_ST.DENSITY_VARIATION,\n"
+                + "  ROUND(T_Q_ST.AVG_DURABILITY,0) AVG_DURABILITY,\n"
+                + "  T_Q_ST.DURABILITY_MARK,\n"
+                + "  T_Q_ST.DURABILITY_VARIATION,\n"
+                + "  T_Q_ST.ADD_MEASURE_NAME_1,\n"
+                + "  T_Q_ST.ADD_MEASURE_VALUE_1,\n"
+                + "  T_Q_ST.ADD_MEASURE_UNIT_1,\n"
+                + "  T_Q_ST.ADD_MEASURE_NAME_2,\n"
+                + "  T_Q_ST.ADD_MEASURE_VALUE_2,\n"
+                + "  T_Q_ST.ADD_MEASURE_UNIT_2,\n"
+                + "  T_Q_ST.APPLY_RATIOS,\n"
+                + "  T_Q_ST_HUMIDITY.HUMIDITY\n"
+                + "FROM T_Q_ST, T_PRODUCT, T_PERSONAL, T_Q_ST_HUMIDITY\n"
+                + "WHERE T_Q_ST.PRODUCT_ID = T_PRODUCT.ID AND T_Q_ST.PERSON_ID = T_PERSONAL.ID AND T_Q_ST.ID = T_Q_ST_HUMIDITY.T_Q_ST_ID\n"
+                + "ORDER BY T_Q_ST.TEST_DATE DESC, T_Q_ST.PART_NO DESC";
+
+        try (ResultSet rset = stmt.executeQuery(query)) {
+            while (rset.next()) {
+                Stat st = new Stat();
+                st.setTestDate(rset.getString("TEST_DATE"));
+                st.setPartNo(rset.getString("PART_NO"));
+                st.setProductName(rset.getString("PRODUCT_NAME"));
+                st.setReqDensity(rset.getFloat("REQ_DENSITY"));
+                st.setReqDurability(rset.getFloat("REQ_DURABILITY"));
+                st.setAvgDryDensity(rset.getFloat("AVG_DRY_DENSITY"));
+                st.setDensityMark(rset.getString("DENSITY_MARK"));
+                st.setDensityVariation(rset.getFloat("DENSITY_VARIATION"));
+                st.setAvgDurability(rset.getFloat("AVG_DURABILITY"));
+                st.setDurabilityMark(rset.getString("DURABILITY_MARK"));
+                st.setDurabilityVariation(rset.getFloat("DURABILITY_VARIATION"));
+                st.setPersonName(rset.getString("PERSON_NAME"));
+                retVal.add(st);
+                /*
+                 String tmp = st.getTestDate().substring(0, 10);
+                 DateFormat df = new SimpleDateFormat("dd.mm.yyyy");
+                 Date d = df.parse(tmp);
+                 */
+            }
+        }
+
+        return retVal;
+    }
+
     //--------------------- Вспомогательные -------------------------------- //
     int currentDensity = 0;     //Хранит информацию о плотности с момента последнего запроса.
     int currentProductId = 0;   //Хранит информацию о типе продукции с момента последнего запроса.
-    
-    private int getDensityByProductId(int productId) throws SQLException{
+
+    private int getDensityByProductId(int productId) throws SQLException {
         //Если код продукцции совпадает с предыдущим кодом, то просто возвращаем плотность для предыдущего продукта.
-        if(productId == currentProductId){
+        if (productId == currentProductId) {
             return currentDensity;
         }
-        
-         if (connection == null) {
+
+        if (connection == null) {
             return 0;
         }
-         
-         int density = 0; //Плотность продукции, для которой выбираем коэффициенты вариации.
-        
+
+        int density = 0; //Плотность продукции, для которой выбираем коэффициенты вариации.
+
         //Сначала смотрим плотность продукции
         Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
         String query = String.format("SELECT  DENSITY FROM T_PRODUCT WHERE ID = %d", productId);
-        
-        //System.out.println("\nExecuting query: " + query);
 
+        //System.out.println("\nExecuting query: " + query);
         try (ResultSet rset = stmt.executeQuery(query)) {
             if (rset.next()) {
                 density = rset.getInt(1);
                 //System.out.println("\nResult is " + density);
             }
-            
+
             //Сохраняем код продукции и плотность.
             currentDensity = density;
             currentProductId = productId;
         }
-        
+
         return density;
     }
 }

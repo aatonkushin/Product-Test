@@ -3,7 +3,7 @@
     <description>Builds, tests, and runs the project ProductTest.</description>
     <import file="nbproject/build-impl.xml"/>
     <target name="-post-jfx-deploy">
-        <fx:deploy width="${javafx.run.width}" height="${javafx.run.height}" nativeBundles="all" outdir="${basedir}/${dist.dir}" outfile="${application.title}" verbose="true">
+        <fx:deploy width="${javafx.run.width}" height="${javafx.run.height}" nativeBundles="all" outdir="${basedir}/${dist.dir}" outfile="${application.title}" verbose="false">
             <fx:application name="${application.title}" mainClass="${javafx.main.class}"/>
             <fx:resources>
                <fx:fileset dir="${basedir}/${dist.dir}" includes="ProductTest.jar"/>

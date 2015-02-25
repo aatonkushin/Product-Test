@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -53,9 +54,11 @@ import producttest.bll.IValueChanged;
 import producttest.model.HumidityTest;
 import producttest.model.Part;
 import producttest.model.Person;
+import producttest.model.Product;
 import producttest.model.Result;
 import producttest.model.SampleTest;
 import producttest.model.SampleType;
+import producttest.model.Stat;
 
 /**
  *
@@ -184,8 +187,48 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
     private TabPane tabPane;
     @FXML
     private Tab tabProductTest;
+    
+    //------------- Вкладка Статистика испытаний ГП -------------
     @FXML
     private Tab tabStatistics;
+    @FXML
+    private ComboBox<Part> comboPartNumStat;
+    @FXML
+    private TableView<Stat> tblStatistics;
+    @FXML
+    private ComboBox<String> comboDensityMarkStat;
+    @FXML
+    private ComboBox<Product> comboProdNameStat;
+    @FXML
+    private ComboBox<String> comboDurabilityMarkStat;
+    @FXML
+    private ComboBox<String> comboMonthStat;
+    @FXML
+    private ComboBox<Integer> comboYearStat;
+    @FXML
+    private TableColumn<Stat, String> colDateStat;
+    @FXML
+    private TableColumn<Stat, String> colPartNumStat;
+    @FXML
+    private TableColumn<Stat, String> colProdNameStat;
+    @FXML
+    private TableColumn<Stat, Float> colReqDensityStat;
+    @FXML
+    private TableColumn<Stat, Float> colReqDurabilityStat;
+    @FXML
+    private TableColumn<Stat, Float> colDryDensityStat;
+    @FXML
+    private TableColumn<Stat, String> colDensityMarkStat;
+    @FXML
+    private TableColumn<Stat, Float> colDensityVariationStat;
+    @FXML
+    private TableColumn<Stat, Float> colDurabilityStat;
+    @FXML
+    private TableColumn<Stat, String> colDurabilityMarkStat;
+    @FXML
+    private TableColumn<Stat, Float> colDurabilityVarStat;
+    @FXML
+    private TableColumn<Stat, String> colPersonStat;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -211,10 +254,47 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         InitSampleColumns();
         InitHumidityColumns();
         InitResultsColumns();
+        
+        colDateStat.setEditable(false);
+        colDateStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("testDate"));
+        
+        colPartNumStat.setEditable(false);
+        colPartNumStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("partNo"));
+        
+        colProdNameStat.setEditable(false);
+        colProdNameStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("productName"));
+        
+        colReqDensityStat.setEditable(false);
+        colReqDensityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("reqDensity"));
+        
+        colReqDurabilityStat.setEditable(false);
+        colReqDurabilityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("reqDurability"));
+        
+        colDryDensityStat.setEditable(false);
+        colDryDensityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("avgDryDensity"));
+        
+        colDensityMarkStat.setEditable(false);
+        colDensityMarkStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("densityMark"));
+        
+        colDensityVariationStat.setEditable(false);
+        colDensityVariationStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("densityVariation"));
+        
+        colDurabilityStat.setEditable(false);
+        colDurabilityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("avgDurability"));
+        
+        colDurabilityMarkStat.setEditable(false);
+        colDurabilityMarkStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("durabilityMark"));
+        
+        colDurabilityVarStat.setEditable(false);
+        colDurabilityVarStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("durabilityVariation"));
+        
+        colPersonStat.setEditable(false);
+        colPersonStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("personName"));
 
         tblSample.setPlaceholder(new Text("Испытание образцов"));
         tblHumidity.setPlaceholder(new Text("Оценка влажности"));
         tblResults.setPlaceholder(new Text("Результаты испытаний"));
+        tblStatistics.setPlaceholder(new Text("Статистика испытаний ГП"));
 
         tblHumidity.setEditable(false);
         tblSample.setEditable(false);
@@ -222,6 +302,7 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         tblSample.setItems(blogic.getSampleTests());
         tblHumidity.setItems(blogic.getHumidityTests());
         tblResults.setItems(blogic.getResults());
+        tblStatistics.setItems(blogic.getProductTestStatistics());
 
         txtFooterRowStart.setMinWidth(colSampleNumResults.getPrefWidth());
         txtFooterRowStart.setMaxWidth(colSampleNumResults.getPrefWidth());
@@ -586,6 +667,44 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void comboPartNumStatOnAction(ActionEvent event) {
+    }
+
+    @FXML
+    private void tabStatisticsOnSelectionChanged(Event event) {
+        //Если выбрана вкладка со статистикой ГП.
+        if(tabStatistics.isSelected()){
+            //Заполняем номера партий.
+            comboPartNumStat.setItems(blogic.getPartNumbers());
+            comboProdNameStat.setItems(blogic.getProducts());
+            comboMonthStat.setItems(blogic.getMonths());
+            comboYearStat.setItems(blogic.getYears());
+            comboDensityMarkStat.setItems(blogic.getDensityMarks());
+            comboDurabilityMarkStat.setItems(blogic.getDurabilityMarks());
+        }
+    }
+
+    @FXML
+    private void comboDensityMarkStatOnAction(ActionEvent event) {
+    }
+
+    @FXML
+    private void comboProdNameStatOnAction(ActionEvent event) {
+    }
+
+    @FXML
+    private void comboDurabilityMarkStatOnAction(ActionEvent event) {
+    }
+
+    @FXML
+    private void comboMonthStatOnAction(ActionEvent event) {
+    }
+
+    @FXML
+    private void comboYearStatOnAction(ActionEvent event) {
     }
 
     class EditingCell extends TableCell<SampleTest, Double> {
