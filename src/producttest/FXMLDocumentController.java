@@ -30,6 +30,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -178,6 +180,12 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
     private ContextMenu contextMenu;
     @FXML
     private MenuItem mnuSettings;
+    @FXML
+    private TabPane tabPane;
+    @FXML
+    private Tab tabProductTest;
+    @FXML
+    private Tab tabStatistics;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
