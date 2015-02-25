@@ -774,7 +774,9 @@ public class DataContext {
         try (ResultSet rset = stmt.executeQuery(query)) {
             while (rset.next()) {
                 Stat st = new Stat();
-                st.setTestDate(rset.getString("TEST_DATE"));
+                DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+                Date d = df.parse(rset.getString("TEST_DATE"));
+                st.setTestDate(d);
                 st.setPartNo(rset.getString("PART_NO"));
                 st.setProductName(rset.getString("PRODUCT_NAME"));
                 st.setReqDensity(rset.getFloat("REQ_DENSITY"));
@@ -789,8 +791,8 @@ public class DataContext {
                 retVal.add(st);
                 /*
                  String tmp = st.getTestDate().substring(0, 10);
-                 DateFormat df = new SimpleDateFormat("dd.mm.yyyy");
-                 Date d = df.parse(tmp);
+                 
+                 
                  */
             }
         }

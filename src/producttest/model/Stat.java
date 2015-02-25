@@ -5,12 +5,14 @@
  */
 package producttest.model;
 
+import java.util.Date;
+
 /**
  * Класс, представляющий запись в таблице Статистика испытаний ГП.
  * @author tonkushin
  */
 public class Stat {
-    private String testDate;            //Дата испытаний
+    private Date testDate;            //Дата испытаний
     private String partNo;              //№ партии
     private String productName;         //Наименование
     private float humidity;             //Влажность
@@ -28,14 +30,14 @@ public class Stat {
     /**
      * @return the testDate
      */
-    public String getTestDate() {
+    public Date getTestDate() {
         return testDate;
     }
 
     /**
      * @param testDate the testDate to set
      */
-    public void setTestDate(String testDate) {
+    public void setTestDate(Date testDate) {
         this.testDate = testDate;
     }
 

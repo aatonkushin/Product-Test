@@ -206,7 +206,7 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
     @FXML
     private ComboBox<Integer> comboYearStat;
     @FXML
-    private TableColumn<Stat, String> colDateStat;
+    private TableColumn<Stat, Date> colDateStat;
     @FXML
     private TableColumn<Stat, String> colPartNumStat;
     @FXML
@@ -256,7 +256,7 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         InitResultsColumns();
         
         colDateStat.setEditable(false);
-        colDateStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("testDate"));
+        colDateStat.setCellValueFactory(new PropertyValueFactory<Stat, Date>("testDate"));
         
         colPartNumStat.setEditable(false);
         colPartNumStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("partNo"));
