@@ -18,8 +18,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.FloatProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleFloatProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -28,6 +34,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import producttest.model.HumidityTest;
+import producttest.model.Month;
 import producttest.model.Part;
 import producttest.model.Person;
 import producttest.model.Result;
@@ -36,6 +43,7 @@ import producttest.model.SampleType;
 import producttest.model.TestReport;
 import producttest.model.Product;
 import producttest.model.Stat;
+import producttest.model.Year;
 
 /**
  *
@@ -52,11 +60,124 @@ public class BLogic {
     private ObservableList<Person> personal; //Список сотрудников-лаборантов.
     private ObservableList<String> positions; //Позиции испытуемых образцов в массиве.
     private ObservableList<Product> products; //Продукция.
-    private ObservableList<String> months;    //Месяцы в году.
-    private ObservableList<Integer> years;    //Годы.
+    private ObservableList<Month> months;    //Месяцы в году.
+    private ObservableList<Year> years;    //Годы.
     private ObservableList<String> densityMarks; //Марки по плотности.
     private ObservableList<String> durabilityMarks; //Марки по прочности.
     private ObservableList<Stat> productTestStatistics; //Статистика испытаний ГП.
+    
+    //Коэф. вариации по прочности во вкладке со статистикой испытаний ГП.
+    private FloatProperty durabilityVarStat;
+    public final void setDurabilityVarStat(Float durability){
+        this.durabilityVarStat.set(durability);
+    }
+    public final Float getDurabilityVarStat(){
+        return this.durabilityVarStat.get();
+    }    
+    public FloatProperty durabilityVarStatProperty(){
+        return this.durabilityVarStat;
+    }
+    //Коэф. вариации по плотности во вкладке со статистикой испытаний ГП.
+    private FloatProperty densityVarStat;
+    public final void setDensityVarStat(Float density){
+        this.densityVarStat.set(density);
+    }
+    public final Float getDensityVarStat(){
+        return this.densityVarStat.get();
+    }
+    public FloatProperty densityVarStatProperty(){
+        return this.densityVarStat;
+    }
+    
+    //Выбранный месяц во вкладке со статистикой испытаний ГП.
+    private ObjectProperty<Month> selectedMonthStat;
+    public final void setSelectedMonthStat(Month selectedMonthStat){
+        this.selectedMonthStat.set(selectedMonthStat);
+    }
+    public final Month getSelectedMonthStat(){
+        return this.selectedMonthStat.get();
+    }
+    public ObjectProperty<Month> selectedMonthStatProperty(){
+        return this.selectedMonthStat;
+    }
+    
+    //Выбранный год во вкладке со статистикой испытаний ГП.
+    private ObjectProperty<Year> selectedYearStat;
+    public final void setSelectedYearStat(Year selectedYearStat){
+        this.selectedYearStat.set(selectedYearStat);
+    }
+    public final Year getSelectedYearStat(){
+        return this.selectedYearStat.get();
+    }
+    public ObjectProperty<Year> selectedYearStatProperty(){
+        return this.selectedYearStat;
+    }
+    
+    //Выбранная марка по плотности во вкладке со статистикой испытаний ГП.
+    private StringProperty selectedDensityMarkStat;
+    public final void setSelectedDensityMarkStat(String selectedDensityMarkStat){
+        this.selectedDensityMarkStat.set(selectedDensityMarkStat);
+    }
+    public final String getSelectedDensityMarkStat(){
+        return selectedDensityMarkStat.get();
+    }
+    public StringProperty selectedDensityMarkStatProperty(){
+        return this.selectedDensityMarkStat;
+    }
+    
+    //Выбранная марка по прочности во вкладке со статистикой испытаний ГП.
+    private StringProperty selectedDurabilityMarkStat;
+    public final void setSelectedDurabilityMarkStat(String selectedDurabilityMarkStat){
+        this.selectedDurabilityMarkStat.set(selectedDurabilityMarkStat);
+    }
+    public final String getSelectedDurabilityMarkStat(){
+        return selectedDurabilityMarkStat.get();
+    }
+    public StringProperty selectedDurabilityMarkStatProperty(){
+        return this.selectedDurabilityMarkStat;
+    }
+    
+    //Количество записей в таблице Статистики ГП во вкладке со статистикой испытаний ГП.
+    private IntegerProperty tblStatisticsItemsCount;
+    public final void setTblStatisticsItemsCount(Integer tblStatisticsItemsCount){
+        this.tblStatisticsItemsCount.set(tblStatisticsItemsCount);
+    }
+    public final Integer getTblStatisticsItemsCount(){
+        return this.tblStatisticsItemsCount.get();
+    }
+    public IntegerProperty tblStatisticsItemsCountProperty(){
+        return tblStatisticsItemsCount;
+    }
+    
+    //Выбранная номенклатура во вкладке со статистикой испытаний ГП.
+    private ObjectProperty<Product> selectedProdNameStat;
+    public final void setSelectedProdNameStat(Product selectedProdNameStat){
+        this.selectedProdNameStat.set(selectedProdNameStat);
+    }
+    
+    public final Product getSelectedProdNameStat(){
+        return this.selectedProdNameStat.get();
+    }
+    
+    public ObjectProperty<Product> selectedProdNameStatProperty(){
+        return this.selectedProdNameStat;
+    }
+    
+    //Выбранная партия во вкладке со статистикой испытаний ГП.
+    private ObjectProperty<Part> selectedPartNumStat;
+    
+    public final void setSelectedPartNumStat(Part selectedPartNumStat){
+        this.selectedPartNumStat.set(selectedPartNumStat);
+    }
+    
+    public final Part getSelectedPartNumStat(){
+        return this.selectedPartNumStat.get();
+    }
+    
+    public ObjectProperty<Part> selectedPartNumStatProperty(){
+        return this.selectedPartNumStat;
+    }
+    //--------------------------------------------------------------------------
 
     //Срядняя плотность во влажном состоянии.
     private DoubleProperty avgWetDensity;
@@ -692,14 +813,14 @@ public class BLogic {
     /**
      * @return the months
      */
-    public ObservableList<String> getMonths() {
+    public ObservableList<Month> getMonths() {
         return months;
     }
 
     /**
      * @param months the months to set
      */
-    public void setMonths(ObservableList<String> months) {
+    public void setMonths(ObservableList<Month> months) {
         this.months = months;
     }
 
@@ -709,14 +830,14 @@ public class BLogic {
     /**
      * @return the years
      */
-    public ObservableList<Integer> getYears() {
+    public ObservableList<Year> getYears() {
         return years;
     }
 
     /**
      * @param years the years to set
      */
-    public void setYears(ObservableList<Integer> years) {
+    public void setYears(ObservableList<Year> years) {
         this.years = years;
     }
     //---------------------------------
@@ -799,15 +920,86 @@ public class BLogic {
         addMeasureValue2 = new SimpleDoubleProperty();
         addMeasureUnit2 = new SimpleStringProperty();
 
-        //---
+        //--- Вкладка испытаний ГП
         products = FXCollections.observableArrayList();
-        months = FXCollections.observableArrayList("", "Январь", "Февраль", "Март",
-                "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь",
-                "Ноябрь", "Декабрь");
+        months = FXCollections.observableArrayList(new Month(), new Month(1, "Январь"), 
+                new Month(2, "Февраль"), new Month(3, "Март"),
+                new Month(4, "Апрель"), new Month(5, "Май"), new Month(6, "Июнь"), 
+                new Month(7, "Июль"), new Month(8, "Август"), new Month(9, "Сентябрь"), 
+                new Month(10, "Октябрь"), new Month(11, "Ноябрь"), new Month(12, "Декабрь"));
         years = FXCollections.observableArrayList();
+        years.add(new Year(0, ""));
         for (int i = 2010; i < 2050; i++) {
-            years.add(i);
+            years.add(new Year(i, String.valueOf(i)));
         }
+        
+        //Выбранная партия на вкладке Статистика испытаний ГП.
+        selectedPartNumStat = new SimpleObjectProperty<>();
+        selectedPartNumStat.addListener(new ChangeListener<Part>() {
+            @Override
+            public void changed(ObservableValue<? extends Part> ov, Part oldVal, Part newVal) {
+                updateProductTestStatistics();
+                updateDensityAndDurabilityStats();
+            }
+        });
+        
+        //Выбранная продукция на вкладке Статистика испытаний ГП.
+        selectedProdNameStat = new SimpleObjectProperty<>();
+        selectedProdNameStat.addListener(new ChangeListener<Product>() {
+            @Override
+            public void changed(ObservableValue<? extends Product> ov, Product oldVal, Product newVal) {
+                updateProductTestStatistics();
+                updateDensityAndDurabilityStats();
+            }
+        });
+        
+        //Выбранный месяц на вкладке Статистика испытаний ГП.
+        selectedMonthStat = new SimpleObjectProperty<>();
+        selectedMonthStat.addListener(new ChangeListener<Month>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Month> ov, Month oldVal, Month newVal) {
+                updateProductTestStatistics();
+                updateDensityAndDurabilityStats();
+            }
+        });
+        
+        //Выбранный год на вкладке Статистика испытаний ГП.
+        selectedYearStat = new SimpleObjectProperty<>();
+        selectedYearStat.addListener(new ChangeListener<Year>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Year> ov, Year oldVal, Year newVal) {
+                updateProductTestStatistics();
+                updateDensityAndDurabilityStats();
+            }
+        });
+        
+        //Выбранная плотность на вкладке Статистика испытаний ГП.
+        selectedDensityMarkStat = new SimpleStringProperty();
+        selectedDensityMarkStat.addListener(new ChangeListener<String>() {
+
+            @Override
+            public void changed(ObservableValue<? extends String> ov, String t, String t1) {
+                updateProductTestStatistics();
+                updateDensityAndDurabilityStats();
+            }
+        });
+        
+        //Выбранная прочность на вкладке Статистика испытаний ГП.
+        selectedDurabilityMarkStat = new SimpleStringProperty();
+        selectedDurabilityMarkStat.addListener(new ChangeListener<String>() {
+
+            @Override
+            public void changed(ObservableValue<? extends String> ov, String t, String t1) {
+                updateProductTestStatistics();
+                updateDensityAndDurabilityStats();
+            }
+        });
+        
+        densityVarStat = new SimpleFloatProperty();
+        durabilityVarStat = new SimpleFloatProperty();
+        //------------------------------------------------
 
         //Отслеживаем изменение средней сухой плотности 
         //и по ней выставляем марку по плотности, а также расчитываем текущий
@@ -1028,6 +1220,47 @@ public class BLogic {
         //Соединяемся с базой данных.
         connectToDB();
     }
+    
+    /**
+     * Обновляет значения коэффициентов вариации по прочности и плотности во вкладке статистика испытаний ГП.
+     */
+    private void updateDensityAndDurabilityStats(){
+        try {
+            densityVarStat.set(dc.getDensityVariationStat(selectedPartNumStat.get(),
+                    selectedProdNameStat.get(), selectedMonthStat.get(), 
+                    selectedYearStat.get(), selectedDensityMarkStat.get(),
+                    selectedDurabilityMarkStat.get()));
+            
+            durabilityVarStat.set(dc.getDurabilityVariationStat(selectedPartNumStat.get(),
+                    selectedProdNameStat.get(), selectedMonthStat.get(), 
+                    selectedYearStat.get(), selectedDensityMarkStat.get(),
+                    selectedDurabilityMarkStat.get()));
+        } catch (SQLException ex) {
+            Logger.getLogger(BLogic.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Обновляет таблицу tblStatistics.
+     */
+    private void updateProductTestStatistics() {
+        if (productTestStatistics == null) {
+            productTestStatistics = FXCollections.observableArrayList();
+            tblStatisticsItemsCount = new SimpleIntegerProperty();
+        }
+        
+        try {
+            productTestStatistics.clear();
+            productTestStatistics.addAll(dc.getProductTestStatistics(selectedPartNumStat.get(), 
+                    selectedProdNameStat.get(), selectedMonthStat.get(), 
+                    selectedYearStat.get(), selectedDensityMarkStat.get(), 
+                    selectedDurabilityMarkStat.get()));
+            
+            setTblStatisticsItemsCount(productTestStatistics.size());
+        } catch (SQLException | ParseException ex) {
+            Logger.getLogger(BLogic.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     /**
      * Добавляет новую запись в таблицу испытаний образцов.
@@ -1082,17 +1315,19 @@ public class BLogic {
             dc = new DataContext();
             dc.connect();
             partNumbers = FXCollections.observableArrayList(dc.GetPartNumbers());
+            partNumbers.set(0, new Part());
+            
             personal = FXCollections.observableArrayList(dc.GetPersonal());
             products = FXCollections.observableArrayList(dc.getProducts());
-            products.set(0, new Product());
+            products.add(0, new Product());
             
             densityMarks = FXCollections.observableArrayList(dc.getDensityMarks());
-            densityMarks.set(0, "");
+            densityMarks.add(0, "");
             
             durabilityMarks = FXCollections.observableArrayList(dc.getDurabilityMarks());
-            durabilityMarks.set(0, "");
+            durabilityMarks.add(0, "");
             
-            productTestStatistics = FXCollections.observableArrayList(dc.getProductTestStatistics());
+            updateProductTestStatistics();
         } catch (SQLRecoverableException ex) {
             Logger.getLogger(BLogic.class.getName()).log(Level.SEVERE, null, ex);
             infoMessage.set(ex.getLocalizedMessage());

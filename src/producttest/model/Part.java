@@ -96,7 +96,7 @@ public class Part {
      * @param productName - наименование продукции.
      */
     public Part(String partNum, Date dateTime, String productName, int productId) {
-        this.df = new SimpleDateFormat("yyyy.MM.dd");
+        this.df = new SimpleDateFormat("dd.MM.yyyy");
         
         this.partNum = partNum;
         this.dateTime = dateTime;
@@ -106,6 +106,10 @@ public class Part {
 
     @Override
     public String toString() {
+        if (this.dateTime == null) {
+            return "";
+        }
+        
         df.format(dateTime);
         String readableDate = df.format(dateTime);
         return this.partNum + " (" + readableDate + ")";

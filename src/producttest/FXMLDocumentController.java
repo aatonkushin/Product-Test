@@ -52,6 +52,7 @@ import javafx.util.converter.NumberStringConverter;
 import producttest.bll.BLogic;
 import producttest.bll.IValueChanged;
 import producttest.model.HumidityTest;
+import producttest.model.Month;
 import producttest.model.Part;
 import producttest.model.Person;
 import producttest.model.Product;
@@ -59,6 +60,7 @@ import producttest.model.Result;
 import producttest.model.SampleTest;
 import producttest.model.SampleType;
 import producttest.model.Stat;
+import producttest.model.Year;
 
 /**
  *
@@ -202,9 +204,9 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
     @FXML
     private ComboBox<String> comboDurabilityMarkStat;
     @FXML
-    private ComboBox<String> comboMonthStat;
+    private ComboBox<Month> comboMonthStat;
     @FXML
-    private ComboBox<Integer> comboYearStat;
+    private ComboBox<Year> comboYearStat;
     @FXML
     private TableColumn<Stat, Date> colDateStat;
     @FXML
@@ -229,6 +231,12 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
     private TableColumn<Stat, Float> colDurabilityVarStat;
     @FXML
     private TableColumn<Stat, String> colPersonStat;
+    @FXML
+    private Label tblStatisticsItemsCount;
+    @FXML
+    private Label lblDensityVarStat;
+    @FXML
+    private Label lblDurabilityVarStat;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -249,47 +257,23 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
 
         lblReqDensity.textProperty().bindBidirectional(blogic.reqDensityProperty(), new NumberStringConverter());
         lblReqDurability.textProperty().bindBidirectional(blogic.reqDurabilityProperty(), new NumberStringConverter());
-
+        
+        //Вкладка Статиситка испытаний ГП.
+        comboPartNumStat.valueProperty().bindBidirectional(blogic.selectedPartNumStatProperty());
+        comboProdNameStat.valueProperty().bindBidirectional(blogic.selectedProdNameStatProperty());
+        comboMonthStat.valueProperty().bindBidirectional(blogic.selectedMonthStatProperty());
+        comboYearStat.valueProperty().bindBidirectional(blogic.selectedYearStatProperty());
+        comboDensityMarkStat.valueProperty().bindBidirectional(blogic.selectedDensityMarkStatProperty());
+        comboDurabilityMarkStat.valueProperty().bindBidirectional(blogic.selectedDurabilityMarkStatProperty());
+        tblStatisticsItemsCount.textProperty().bindBidirectional(blogic.tblStatisticsItemsCountProperty(), new NumberStringConverter());
+        lblDensityVarStat.textProperty().bindBidirectional(blogic.densityVarStatProperty(), new NumberStringConverter());
+        lblDurabilityVarStat.textProperty().bindBidirectional(blogic.durabilityVarStatProperty(), new NumberStringConverter());
+        
         //Инициализация колонок в таблицах.
         InitSampleColumns();
         InitHumidityColumns();
         InitResultsColumns();
-        
-        colDateStat.setEditable(false);
-        colDateStat.setCellValueFactory(new PropertyValueFactory<Stat, Date>("testDate"));
-        
-        colPartNumStat.setEditable(false);
-        colPartNumStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("partNo"));
-        
-        colProdNameStat.setEditable(false);
-        colProdNameStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("productName"));
-        
-        colReqDensityStat.setEditable(false);
-        colReqDensityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("reqDensity"));
-        
-        colReqDurabilityStat.setEditable(false);
-        colReqDurabilityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("reqDurability"));
-        
-        colDryDensityStat.setEditable(false);
-        colDryDensityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("avgDryDensity"));
-        
-        colDensityMarkStat.setEditable(false);
-        colDensityMarkStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("densityMark"));
-        
-        colDensityVariationStat.setEditable(false);
-        colDensityVariationStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("densityVariation"));
-        
-        colDurabilityStat.setEditable(false);
-        colDurabilityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("avgDurability"));
-        
-        colDurabilityMarkStat.setEditable(false);
-        colDurabilityMarkStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("durabilityMark"));
-        
-        colDurabilityVarStat.setEditable(false);
-        colDurabilityVarStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("durabilityVariation"));
-        
-        colPersonStat.setEditable(false);
-        colPersonStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("personName"));
+        InitStatColumns();
 
         tblSample.setPlaceholder(new Text("Испытание образцов"));
         tblHumidity.setPlaceholder(new Text("Оценка влажности"));
@@ -355,6 +339,65 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
 
         //Устанавливаем ро, так как из SceneBuilder не получается.
         lblRho.setText("\u03c1");
+    }
+
+    /**
+     * Инициализация колонок в таблице tblStatistics - статистика испытаний ГП.
+     */
+    private void InitStatColumns() {
+        colDateStat.setEditable(false);
+        colDateStat.setCellValueFactory(new PropertyValueFactory<Stat, Date>("testDate"));
+        colDateStat.setCellFactory(new Callback<TableColumn<Stat, Date>, TableCell<Stat, Date>>() {
+            //Взято из: http://code.makery.ch/blog/javafx-2-tableview-cell-renderer/
+            @Override
+            public TableCell<Stat, Date> call(TableColumn<Stat, Date> p) {
+                return new TableCell<Stat, Date>(){
+                    @Override
+                    protected void updateItem(Date item, boolean empty){
+                        super.updateItem(item, empty);
+                        
+                        if (!empty) {
+                            setText(new SimpleDateFormat("dd.MM.yyyy").format(item));
+                        } else{
+                            setText(null);
+                        }
+                    }
+                };
+            }
+        });
+        
+        colPartNumStat.setEditable(false);
+        colPartNumStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("partNo"));
+        
+        colProdNameStat.setEditable(false);
+        colProdNameStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("productName"));
+        
+        colReqDensityStat.setEditable(false);
+        colReqDensityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("reqDensity"));
+        
+        colReqDurabilityStat.setEditable(false);
+        colReqDurabilityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("reqDurability"));
+        
+        colDryDensityStat.setEditable(false);
+        colDryDensityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("avgDryDensity"));
+        
+        colDensityMarkStat.setEditable(false);
+        colDensityMarkStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("densityMark"));
+        
+        colDensityVariationStat.setEditable(false);
+        colDensityVariationStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("densityVariation"));
+        
+        colDurabilityStat.setEditable(false);
+        colDurabilityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("avgDurability"));
+        
+        colDurabilityMarkStat.setEditable(false);
+        colDurabilityMarkStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("durabilityMark"));
+        
+        colDurabilityVarStat.setEditable(false);
+        colDurabilityVarStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("durabilityVariation"));
+        
+        colPersonStat.setEditable(false);
+        colPersonStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("personName"));
     }
 
     /**
