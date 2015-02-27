@@ -332,7 +332,7 @@
                      <children>
                         <VBox>
                            <children>
-                              <GridPane hgap="10.0">
+                              <GridPane fx:id="grdStatisticsContols" hgap="10.0">
                                 <columnConstraints>
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
@@ -358,8 +358,8 @@
                                     <ComboBox fx:id="comboDurabilityMarkStat" onAction="#comboDurabilityMarkStatOnAction" prefWidth="150.0" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                                     <ComboBox fx:id="comboMonthStat" onAction="#comboMonthStatOnAction" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                     <ComboBox fx:id="comboYearStat" onAction="#comboYearStatOnAction" prefWidth="150.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                                    <Label text="Коэф. вариации по плотности" GridPane.rowIndex="3" />
-                                    <Label text="Коэф. вариации по прочности" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                    <Label fx:id="lblDensityVarStatTitle" text="Коэф. вариации по плотности" GridPane.rowIndex="3" />
+                                    <Label fx:id="lblDurabilityVarStatTitle" text="Коэф. вариации по прочности" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                     <Label fx:id="lblDensityVarStat" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                     <Label fx:id="lblDurabilityVarStat" text="-" GridPane.columnIndex="3" GridPane.rowIndex="3" />
                                  </children>
@@ -369,7 +369,7 @@
                               </GridPane>
                            </children>
                         </VBox>
-                        <TableView fx:id="tblStatistics" layoutX="4.0" layoutY="130.0" prefHeight="338.0" prefWidth="938.0">
+                        <TableView fx:id="tblStatistics" layoutX="4.0" layoutY="130.0" onMouseClicked="#tblStatisticsOnMouseClicked" prefHeight="338.0" prefWidth="938.0">
                           <columns>
                             <TableColumn fx:id="colDateStat" prefWidth="62.0" text="Дата" />
                             <TableColumn fx:id="colPartNumStat" prefWidth="74.0" text="№ партии" />

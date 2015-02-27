@@ -42,7 +42,10 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -189,7 +192,7 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
     private TabPane tabPane;
     @FXML
     private Tab tabProductTest;
-    
+
     //------------- Вкладка Статистика испытаний ГП -------------
     @FXML
     private Tab tabStatistics;
@@ -237,6 +240,12 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
     private Label lblDensityVarStat;
     @FXML
     private Label lblDurabilityVarStat;
+    @FXML
+    private Label lblDensityVarStatTitle;
+    @FXML
+    private Label lblDurabilityVarStatTitle;
+    @FXML
+    private GridPane grdStatisticsContols;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -257,7 +266,7 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
 
         lblReqDensity.textProperty().bindBidirectional(blogic.reqDensityProperty(), new NumberStringConverter());
         lblReqDurability.textProperty().bindBidirectional(blogic.reqDurabilityProperty(), new NumberStringConverter());
-        
+
         //Вкладка Статиситка испытаний ГП.
         comboPartNumStat.valueProperty().bindBidirectional(blogic.selectedPartNumStatProperty());
         comboProdNameStat.valueProperty().bindBidirectional(blogic.selectedProdNameStatProperty());
@@ -268,7 +277,7 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         tblStatisticsItemsCount.textProperty().bindBidirectional(blogic.tblStatisticsItemsCountProperty(), new NumberStringConverter());
         lblDensityVarStat.textProperty().bindBidirectional(blogic.densityVarStatProperty(), new NumberStringConverter());
         lblDurabilityVarStat.textProperty().bindBidirectional(blogic.durabilityVarStatProperty(), new NumberStringConverter());
-        
+
         //Инициализация колонок в таблицах.
         InitSampleColumns();
         InitHumidityColumns();
@@ -351,51 +360,133 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
             //Взято из: http://code.makery.ch/blog/javafx-2-tableview-cell-renderer/
             @Override
             public TableCell<Stat, Date> call(TableColumn<Stat, Date> p) {
-                return new TableCell<Stat, Date>(){
+                return new TableCell<Stat, Date>() {
                     @Override
-                    protected void updateItem(Date item, boolean empty){
+                    protected void updateItem(Date item, boolean empty) {
                         super.updateItem(item, empty);
-                        
+
                         if (!empty) {
                             setText(new SimpleDateFormat("dd.MM.yyyy").format(item));
-                        } else{
+                        } else {
                             setText(null);
                         }
                     }
                 };
             }
         });
-        
+
         colPartNumStat.setEditable(false);
         colPartNumStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("partNo"));
-        
+
         colProdNameStat.setEditable(false);
         colProdNameStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("productName"));
-        
+
+        //Обратный вызов для колонок с типом Float и необходимостью округления до целого.
+        //Не переводим на Int, так как не уверены, что следует всегда округлять.
+        Callback<TableColumn<Stat, Float>, TableCell<Stat, Float>> floatCallback = new Callback<TableColumn<Stat, Float>, TableCell<Stat, Float>>() {
+
+            @Override
+            public TableCell<Stat, Float> call(TableColumn<Stat, Float> p) {
+                return new TableCell<Stat, Float>() {
+                    @Override
+                    protected void updateItem(Float item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        //Устанавливаем выравнивание по правой стороне.
+                        setAlignment(Pos.CENTER_RIGHT);
+
+                        //Округляем до целого числа.
+                        if (!empty) {
+                            setText(String.valueOf(Math.round(item)));
+                        } else {
+                            setText(null);
+                        }
+                    }
+                };
+            }
+        };
+
+        //Обратный вызов для колонок с типом Float.
+        //Не переводим на Int, так как не уверены, что следует всегда округлять.
+        Callback<TableColumn<Stat, Float>, TableCell<Stat, Float>> floatCallbackWoRound = new Callback<TableColumn<Stat, Float>, TableCell<Stat, Float>>() {
+
+            @Override
+            public TableCell<Stat, Float> call(TableColumn<Stat, Float> p) {
+                return new TableCell<Stat, Float>() {
+                    @Override
+                    protected void updateItem(Float item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        //Устанавливаем выравнивание по правой стороне.
+                        setAlignment(Pos.CENTER_RIGHT);
+
+                        //Округляем до целого числа.
+                        if (!empty) {
+                            setText(item.toString());
+                        } else {
+                            setText(null);
+                        }
+                    }
+                };
+            }
+        };
+
+        //Обратный вызов для колонок с типом String.
+        Callback<TableColumn<Stat, String>, TableCell<Stat, String>> stringCallback = new Callback<TableColumn<Stat, String>, TableCell<Stat, String>>() {
+
+            @Override
+            public TableCell<Stat, String> call(TableColumn<Stat, String> p) {
+                return new TableCell<Stat, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        //Устанавливаем выравнивание по правой стороне.
+                        setAlignment(Pos.CENTER);
+
+                        //Округляем до целого числа.
+                        if (!empty) {
+                            setText(item);
+                        } else {
+                            setText(null);
+                        }
+                    }
+                };
+            }
+        };
+
         colReqDensityStat.setEditable(false);
         colReqDensityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("reqDensity"));
-        
+        colReqDensityStat.setCellFactory(floatCallback);
+
         colReqDurabilityStat.setEditable(false);
         colReqDurabilityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("reqDurability"));
-        
+        colReqDurabilityStat.setCellFactory(floatCallback);
+
         colDryDensityStat.setEditable(false);
         colDryDensityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("avgDryDensity"));
-        
+        colDryDensityStat.setCellFactory(floatCallback);
+
         colDensityMarkStat.setEditable(false);
         colDensityMarkStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("densityMark"));
-        
+        colDensityMarkStat.setCellFactory(stringCallback);
+
         colDensityVariationStat.setEditable(false);
         colDensityVariationStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("densityVariation"));
-        
+        colDensityVariationStat.setCellFactory(floatCallbackWoRound);
+
         colDurabilityStat.setEditable(false);
         colDurabilityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("avgDurability"));
-        
+        colDurabilityStat.setCellFactory(floatCallback);
+
         colDurabilityMarkStat.setEditable(false);
         colDurabilityMarkStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("durabilityMark"));
-        
+        colDurabilityMarkStat.setCellFactory(stringCallback);
+
         colDurabilityVarStat.setEditable(false);
         colDurabilityVarStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("durabilityVariation"));
-        
+        colDurabilityVarStat.setCellFactory(floatCallbackWoRound);
+
         colPersonStat.setEditable(false);
         colPersonStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("personName"));
     }
@@ -719,7 +810,7 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
     @FXML
     private void tabStatisticsOnSelectionChanged(Event event) {
         //Если выбрана вкладка со статистикой ГП.
-        if(tabStatistics.isSelected()){
+        if (tabStatistics.isSelected()) {
             //Заполняем номера партий.
             comboPartNumStat.setItems(blogic.getPartNumbers());
             comboProdNameStat.setItems(blogic.getProducts());
@@ -748,6 +839,21 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
 
     @FXML
     private void comboYearStatOnAction(ActionEvent event) {
+    }
+
+    @FXML
+    private void tblStatisticsOnMouseClicked(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            Stat s = tblStatistics.getSelectionModel().getSelectedItem();
+            tabPane.getSelectionModel().select(tabProductTest);
+
+            for (Part p : blogic.getPartNumbers()) {
+                if (p.getPartNum() != null && p.getPartNum().equals(s.getPartNo())) {
+                    comboPartNum.getSelectionModel().select(p);
+                    return;
+                }
+            }
+        }
     }
 
     class EditingCell extends TableCell<SampleTest, Double> {

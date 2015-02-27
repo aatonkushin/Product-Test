@@ -16,8 +16,8 @@ public class Stat {
     private String partNo;              //№ партии
     private String productName;         //Наименование
     private float humidity;             //Влажность
-    private float reqDensity;           //Требуемая плотность
-    private float reqDurability;        //Требуемая прочность
+    private float reqDensity;           //Требуемая плотность   //Не переводим на Int, так как не уверены, что следует всегда округлять.
+    private float reqDurability;        //Требуемая прочность   //Не переводим на Int, так как не уверены, что следует всегда округлять.
     private float avgWetDensity;        //Плотность влажн.
     private float avgDryDensity;        //Плотность сух.
     private String densityMark;         //Марка по плотности
