@@ -26,6 +26,8 @@ import producttest.model.Person;
 import producttest.model.SampleTest;
 import producttest.model.TestReport;
 import producttest.model.Product;
+import producttest.model.RequiredDensity;
+import producttest.model.RequiredDurability;
 import producttest.model.Stat;
 import producttest.model.Year;
 
@@ -658,6 +660,7 @@ public class DataContext {
      * Возвращает список с продукцией.
      *
      * @return
+     * @throws java.sql.SQLException
      */
     public ArrayList<Product> getProducts() throws SQLException {
         if (connection == null) {
@@ -821,9 +824,11 @@ public class DataContext {
 
         return retVal;
     }
-    
+
     /**
-     * Возвращает коэффициент вариации по плотности, полученный согласно заданных параметров.
+     * Возвращает коэффициент вариации по плотности, полученный согласно
+     * заданных параметров.
+     *
      * @param part - партия
      * @param product - продукция
      * @param month - месяц
@@ -831,7 +836,7 @@ public class DataContext {
      * @param density - плотность
      * @param durability - прочность
      * @return
-     * @throws SQLException 
+     * @throws SQLException
      */
     public float getDensityVariationStat(Part part, Product product, Month month, Year year, String density, String durability) throws SQLException {
         float retVal = 0;
@@ -849,7 +854,7 @@ public class DataContext {
         String yearWhere = (year != null && year.getReturnValue() != 0) ? " AND EXTRACT (YEAR FROM T_Q_ST.TEST_DATE) = " + year.getReturnValue() + " " : "";
         String durabilityWhere = (durability != null && !durability.equals("")) ? " AND T_Q_ST.DURABILITY_MARK = '" + durability + "' " : "";
 
-        String query = "SELECT AVG(DENSITY_VARIATION) DV FROM T_Q_ST "+densityWhere + yearWhere + monthWhere + partWhere + durabilityWhere + productWhere;
+        String query = "SELECT AVG(DENSITY_VARIATION) DV FROM T_Q_ST " + densityWhere + yearWhere + monthWhere + partWhere + durabilityWhere + productWhere;
 
         try (ResultSet rset = stmt.executeQuery(query)) {
             if (rset.next()) {
@@ -861,19 +866,21 @@ public class DataContext {
     }
 
     /**
-     * Возвращает коэффициент вариации по прочности, полученный согласно заданных параметров.
+     * Возвращает коэффициент вариации по прочности, полученный согласно
+     * заданных параметров.
+     *
      * @param part - партия
      * @param product - продукция
-     * @param month - месяц
+     * @param month - месяцж
      * @param year - год
      * @param density - плотность
      * @param durability - прочность
      * @return
-     * @throws SQLException 
+     * @throws SQLException
      */
     public float getDurabilityVariationStat(Part part, Product product, Month month, Year year, String density, String durability) throws SQLException {
         float retVal = 0;
-        
+
         if (connection == null || durability == null || durability.equals("")) {
             return retVal;
         }
@@ -886,14 +893,87 @@ public class DataContext {
         String monthWhere = (month != null && month.getName() != null) ? " AND EXTRACT (MONTH FROM T_Q_ST.TEST_DATE) = " + month.getId() + " " : "";
         String yearWhere = (year != null && year.getReturnValue() != 0) ? " AND EXTRACT (YEAR FROM T_Q_ST.TEST_DATE) = " + year.getReturnValue() + " " : "";
         String densityWhere = (density != null && !density.equals("")) ? " AND T_Q_ST.DENSITY_MARK = '" + density + "' " : "";
-        String query = "SELECT AVG(DURABILITY_VARIATION) DV FROM T_Q_ST \n" + durabilityWhere +densityWhere + yearWhere + monthWhere + partWhere  + productWhere;
+        String query = "SELECT AVG(DURABILITY_VARIATION) DV FROM T_Q_ST \n" + durabilityWhere + densityWhere + yearWhere + monthWhere + partWhere + productWhere;
 
         try (ResultSet rset = stmt.executeQuery(query)) {
             if (rset.next()) {
                 retVal = rset.getFloat("DV");
             }
         }
-        
+
+        return retVal;
+    }
+
+    /**
+     * Возвращает список "класс по плотности - требуемая плотность" для таблицы
+     * Требуемая плотность.
+     *
+     * @param month - месяц, выбранный пользователем.
+     * @param year - год, выбранный пользователем.
+     * @return
+     * @throws SQLException
+     */
+    public ArrayList<RequiredDensity> getRequiredDensities(Month month, Year year) throws SQLException {
+        ArrayList<RequiredDensity> retVal = new ArrayList<>();
+
+        if (connection == null || month == null || month.getName() == null
+                || month.getId() == 0 || year == null || year.getReturnValue() == 0) {
+            return retVal;
+        }
+
+        Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+        String query = String.format("SELECT DISTINCT(DENSITY_MARK) DENSITY_MARK,\n"
+                + " SUPP_PKG.GET_REQ_DENSITY(%d, %d, DENSITY_MARK) P\n"
+                + " FROM T_Q_ST ORDER BY DENSITY_MARK", month.getId(), year.getReturnValue());
+
+        try (ResultSet rset = stmt.executeQuery(query)) {
+            while (rset.next()) {
+                RequiredDensity rd = new RequiredDensity();
+                rd.setName(rset.getString("DENSITY_MARK"));
+                rd.setValue(rset.getInt("P"));
+                if (rd.getName() != null && !rd.getName().equals("")) {
+                    retVal.add(rd);
+                }
+            }
+        }
+
+        return retVal;
+    }
+
+    /**
+     * Возвращает список "класс по прочности - требуемая прочность" для таблицы
+     * Требуемая прочность.
+     *
+     * @param month - месяц, выбранный пользователем.
+     * @param year - год, выбранный пользователем.
+     * @return
+     * @throws SQLException
+     */
+    public ArrayList<RequiredDurability> getRequiredDurabilities(Month month, Year year) throws SQLException {
+        ArrayList<RequiredDurability> retVal = new ArrayList<>();
+
+        if (connection == null || month == null || month.getName() == null
+                || month.getId() == 0 || year == null || year.getReturnValue() == 0) {
+            return retVal;
+        }
+
+        Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+        String query = String.format("SELECT DISTINCT(DURABILITY_MARK) DM,\n"
+                + " SUPP_PKG.GET_REQ_DURABILITY(%d, %d, DURABILITY_MARK) P\n"
+                + " FROM T_Q_ST\n"
+                + " ORDER BY DURABILITY_MARK", month.getId(), year.getReturnValue());
+
+        try (ResultSet rset = stmt.executeQuery(query)) {
+            while (rset.next()) {
+                RequiredDurability rd = new RequiredDurability();
+                rd.setName(rset.getString("DURABILITY_MARK"));
+                rd.setValue(rset.getFloat("P"));
+                retVal.add(rd);
+            }
+        }
+
         return retVal;
     }
 

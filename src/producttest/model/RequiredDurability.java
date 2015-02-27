@@ -6,12 +6,12 @@
 package producttest.model;
 
 /**
- * Класс сущности, представляющей требуемую плотность.
+ * Класс сущности, представляющей требуемую прочность.
  * @author tonkushin
  */
-public class RequiredDensity {
-    private String name;    //Марка по плотности.
-    private int value;      //Требуемая плотность
+public class RequiredDurability {
+    private String name;    //Класс прочности
+    private float value;    //Требуемая прочность бетона
 
     /**
      * @return the name
@@ -30,14 +30,14 @@ public class RequiredDensity {
     /**
      * @return the value
      */
-    public int getValue() {
+    public float getValue() {
         return value;
     }
 
     /**
      * @param value the value to set
      */
-    public void setValue(int value) {
+    public void setValue(float value) {
         this.value = value;
     }
 }

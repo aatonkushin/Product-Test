@@ -59,6 +59,8 @@ import producttest.model.Month;
 import producttest.model.Part;
 import producttest.model.Person;
 import producttest.model.Product;
+import producttest.model.RequiredDensity;
+import producttest.model.RequiredDurability;
 import producttest.model.Result;
 import producttest.model.SampleTest;
 import producttest.model.SampleType;
@@ -246,6 +248,18 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
     private Label lblDurabilityVarStatTitle;
     @FXML
     private GridPane grdStatisticsContols;
+    @FXML
+    private TableView<RequiredDensity> tblRequiredDensity;
+    @FXML
+    private TableView<RequiredDurability> tblRequiredDurability;
+    @FXML
+    private TableColumn<RequiredDensity, String> colDensityMarkReq;
+    @FXML
+    private TableColumn<RequiredDensity, Integer> colReqDensityReq;
+    @FXML
+    private TableColumn<RequiredDurability, String> colDurabilityMarkReq;
+    @FXML
+    private TableColumn<RequiredDurability, Float> colReqDurabilityReq;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -283,12 +297,21 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         InitHumidityColumns();
         InitResultsColumns();
         InitStatColumns();
+        
+        colDensityMarkReq.setEditable(false);
+        colDensityMarkReq.setCellValueFactory(new PropertyValueFactory<RequiredDensity, String>("name"));
+        
+        colReqDensityReq.setEditable(false);
+        colReqDensityReq.setCellValueFactory(new PropertyValueFactory<RequiredDensity, Integer>("value"));
+        
 
         tblSample.setPlaceholder(new Text("Испытание образцов"));
         tblHumidity.setPlaceholder(new Text("Оценка влажности"));
         tblResults.setPlaceholder(new Text("Результаты испытаний"));
         tblStatistics.setPlaceholder(new Text("Статистика испытаний ГП"));
-
+        tblRequiredDensity.setPlaceholder(new Text("Требуемая плотность"));
+        tblRequiredDurability.setPlaceholder(new Text("Требуемая прочность"));
+        
         tblHumidity.setEditable(false);
         tblSample.setEditable(false);
 
@@ -296,6 +319,7 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         tblHumidity.setItems(blogic.getHumidityTests());
         tblResults.setItems(blogic.getResults());
         tblStatistics.setItems(blogic.getProductTestStatistics());
+        tblRequiredDensity.setItems(blogic.getRequiredDensities());
 
         txtFooterRowStart.setMinWidth(colSampleNumResults.getPrefWidth());
         txtFooterRowStart.setMaxWidth(colSampleNumResults.getPrefWidth());
