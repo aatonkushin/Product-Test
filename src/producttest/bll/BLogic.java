@@ -42,6 +42,7 @@ import producttest.model.SampleTest;
 import producttest.model.SampleType;
 import producttest.model.TestReport;
 import producttest.model.Product;
+import producttest.model.ProductPassport;
 import producttest.model.RequiredDensity;
 import producttest.model.RequiredDurability;
 import producttest.model.Stat;
@@ -69,6 +70,61 @@ public class BLogic {
     private ObservableList<Stat> productTestStatistics; //Статистика испытаний ГП.
     private ObservableList<RequiredDensity> requiredDensities;  //Требуемые плотности.
     private ObservableList<RequiredDurability> requiredDurabilities; //Требуемые прочности.
+    private ObservableList<ProductPassport> productPassports;       //Паспорта продукции.
+
+    //Количество записей в таблице Статистики ГП во вкладке со статистикой испытаний ГП.
+    private IntegerProperty tblPassportsItemsCount;
+
+    public final void setTblPassportsItemsCount(Integer tblPassportsItemsCount) {
+        this.tblPassportsItemsCount.set(tblPassportsItemsCount);
+    }
+
+    public final Integer getTblPassportsItemsCount() {
+        return this.tblPassportsItemsCount.get();
+    }
+
+    public IntegerProperty tblPassportsItemsCountProperty() {
+        return tblPassportsItemsCount;
+    }
+
+    //Паспорта продукции.
+    public ObservableList<ProductPassport> getProductPassports() {
+        return productPassports;
+    }
+
+    public void setProductPassports(ObservableList<ProductPassport> productPassports) {
+        this.productPassports = productPassports;
+    }
+
+    //Выбранный месяц во вкладке Реестр пасопртов ГП.
+    private ObjectProperty<Month> selectedMonthPass;
+
+    public final void setSelectedMonthPass(Month selectedMonthPass) {
+        this.selectedMonthPass.set(selectedMonthPass);
+    }
+
+    public final Month getSelectedMonthPass() {
+        return this.selectedMonthPass.get();
+    }
+
+    public ObjectProperty<Month> selectedMonthPassProperty() {
+        return this.selectedMonthPass;
+    }
+
+    //Выбранный год во вкладке Реестр пасопртов ГП.
+    private ObjectProperty<Year> selectedYearPass;
+
+    public final void setSelectedYearPass(Year selectedYearPass) {
+        this.selectedYearPass.set(selectedYearPass);
+    }
+
+    public final Year getSelectedYearPass() {
+        return this.selectedYearPass.get();
+    }
+
+    public ObjectProperty<Year> selectedYearPassProperty() {
+        return this.selectedYearPass;
+    }
 
     //Требуемые плотности.
     public ObservableList<RequiredDensity> getRequiredDensities() {
@@ -1052,6 +1108,29 @@ public class BLogic {
         //Требуемые прочности в разделе Статистика испытаний ГП.
         requiredDurabilities = FXCollections.observableArrayList();
 
+        // --- Вкладка Реестр пасопртов ГП. ---
+        productPassports = FXCollections.observableArrayList();
+        
+        tblPassportsItemsCount = new SimpleIntegerProperty();
+
+        selectedMonthPass = new SimpleObjectProperty<>();
+        selectedMonthPass.addListener(new ChangeListener<Month>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Month> ov, Month oldVal, Month newVal) {
+                updateProductPassports();
+            }
+        });
+
+        selectedYearPass = new SimpleObjectProperty<>();
+        selectedYearPass.addListener(new ChangeListener<Year>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Year> ov, Year oldVal, Year newVal) {
+                updateProductPassports();
+            }
+        });
+
         //------------------------------------------------
         //Отслеживаем изменение средней сухой плотности 
         //и по ней выставляем марку по плотности, а также расчитываем текущий
@@ -1265,6 +1344,23 @@ public class BLogic {
     }
 
     /**
+     * Обновляет список с паспортами.
+     */
+    private void updateProductPassports() {
+        if (productPassports == null) {
+            productPassports = FXCollections.observableArrayList();
+        }
+
+        productPassports.clear();
+        try {
+            productPassports.addAll(dc.getProductPassports(getSelectedMonthPass(), getSelectedYearPass()));
+            setTblPassportsItemsCount(productPassports.size());
+        } catch (SQLException | ParseException ex) {
+            Logger.getLogger(BLogic.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
      * Обновляет значения коэффициентов вариации по прочности и плотности во
      * вкладке статистика испытаний ГП.
      */
@@ -1307,7 +1403,8 @@ public class BLogic {
     }
 
     /**
-     * Обновляет вкладку статистики испытаний ГП (nтаблицы Требуемая прочность и Требуемая плотность).
+     * Обновляет вкладку статистики испытаний ГП (nтаблицы Требуемая прочность и
+     * Требуемая плотность).
      */
     private void updateRequiredDensityAndDurabilityStatistics() {
         try {
@@ -1318,14 +1415,14 @@ public class BLogic {
 
             requiredDensities.clear();
             requiredDensities.addAll(dc.getRequiredDensities(getSelectedMonthStat(), getSelectedYearStat()));
-            
-            if(requiredDurabilities == null){
+
+            if (requiredDurabilities == null) {
                 requiredDurabilities = FXCollections.observableArrayList();
             }
-            
+
             requiredDurabilities.clear();
             requiredDurabilities.addAll(dc.getRequiredDurabilities(getSelectedMonthStat(), getSelectedYearStat()));
-            
+
         } catch (SQLException ex) {
             System.err.println(ex);
         }

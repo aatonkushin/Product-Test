@@ -12,10 +12,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -55,11 +55,16 @@ import javafx.util.converter.IntegerStringConverter;
 import javafx.util.converter.NumberStringConverter;
 import producttest.bll.BLogic;
 import producttest.bll.IValueChanged;
+import producttest.helpers.FloatPassCallback;
+import producttest.helpers.FloatStatCallback;
+import producttest.helpers.FloatStatWORoundCallback;
+import producttest.helpers.StringStatCallback;
 import producttest.model.HumidityTest;
 import producttest.model.Month;
 import producttest.model.Part;
 import producttest.model.Person;
 import producttest.model.Product;
+import producttest.model.ProductPassport;
 import producttest.model.RequiredDensity;
 import producttest.model.RequiredDurability;
 import producttest.model.Result;
@@ -261,6 +266,36 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
     private TableColumn<RequiredDurability, String> colDurabilityMarkReq;
     @FXML
     private TableColumn<RequiredDurability, Float> colReqDurabilityReq;
+    @FXML
+    private Tab tabPassports;
+    @FXML
+    private ComboBox<Month> comboMonthPass;
+    @FXML
+    private ComboBox<Year> comboYearPass;
+    @FXML
+    private Button btnAddPass;
+    @FXML
+    private Button btnChangePass;
+    @FXML
+    private Button btnDeletePass;
+    @FXML
+    private Button btnPrintPass;
+    @FXML
+    private TableView<ProductPassport> tblPassports;
+    @FXML
+    private TableColumn<ProductPassport, Date> colDatePass;
+    @FXML
+    private TableColumn<ProductPassport, String> colPartNumPass;
+    @FXML
+    private TableColumn<ProductPassport, Product> colProdNamePass;
+    @FXML
+    private TableColumn<ProductPassport, Float> colDurabilityPass;
+    @FXML
+    private TableColumn<ProductPassport, Float> colDensityPass;
+    @FXML
+    private TableColumn<ProductPassport, String> colNotesPass;
+    @FXML
+    private Label tblPassportsItemsCount;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -287,17 +322,17 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         comboProdNameStat.valueProperty().bindBidirectional(blogic.selectedProdNameStatProperty());
         comboMonthStat.valueProperty().bindBidirectional(blogic.selectedMonthStatProperty());
         comboMonthStat.setItems(blogic.getMonths());
-        comboMonthStat.getSelectionModel().select(Calendar.getInstance().get(Calendar.MONTH)+1);  //Устанавливаем текущий месяц на вкладке статистики ГП.
+        comboMonthStat.getSelectionModel().select(Calendar.getInstance().get(Calendar.MONTH) + 1);  //Устанавливаем текущий месяц на вкладке статистики ГП.
         comboYearStat.valueProperty().bindBidirectional(blogic.selectedYearStatProperty());
         comboYearStat.setItems(blogic.getYears());                                              //Устанавливаем текущий год на вкладке статистики ГП.
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);                            //
-        for(Year y : blogic.getYears()){                                                        //    
+        for (Year y : blogic.getYears()) {                                                      //    
             if (y.getReturnValue() == currentYear) {                                            //        
                 comboYearStat.getSelectionModel().select(y);                                    //
                 break;                                                                          //
             }                                                                                   //
         }                                                                                       //
-        
+
         comboDensityMarkStat.valueProperty().bindBidirectional(blogic.selectedDensityMarkStatProperty());
         comboDurabilityMarkStat.valueProperty().bindBidirectional(blogic.selectedDurabilityMarkStatProperty());
         tblStatisticsItemsCount.textProperty().bindBidirectional(blogic.tblStatisticsItemsCountProperty(), new NumberStringConverter());
@@ -311,6 +346,7 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         InitStatColumns();
         InitDensityColumns();
         InitDurabilityColumns();
+        InitPassportColumns();
 
         //Устанавлеваем подписи для пустых таблиц.
         tblSample.setPlaceholder(new Text("Испытание образцов"));
@@ -319,7 +355,7 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         tblStatistics.setPlaceholder(new Text("Статистика испытаний ГП"));
         tblRequiredDensity.setPlaceholder(new Text("Требуемая плотность"));
         tblRequiredDurability.setPlaceholder(new Text("Требуемая прочность"));
-        
+
         tblHumidity.setEditable(false);
         tblSample.setEditable(false);
 
@@ -329,6 +365,7 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         tblStatistics.setItems(blogic.getProductTestStatistics());
         tblRequiredDensity.setItems(blogic.getRequiredDensities());
         tblRequiredDurability.setItems(blogic.getRequiredDurabilities());
+        tblPassports.setItems(blogic.getProductPassports());
 
         txtFooterRowStart.setMinWidth(colSampleNumResults.getPrefWidth());
         txtFooterRowStart.setMaxWidth(colSampleNumResults.getPrefWidth());
@@ -384,26 +421,71 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
     }
 
     /**
-     * Инициализация колонок в таблице tblRequiredDurability - статистика испытаний ГП.
+     * Инициализация колонок в таблице Реестр паспортов ГП.
+     */
+    private void InitPassportColumns() {
+        colDatePass.setEditable(false);
+        colDatePass.setCellValueFactory(new PropertyValueFactory<ProductPassport, Date>("date"));
+        colDatePass.setCellFactory(new Callback<TableColumn<ProductPassport, Date>, TableCell<ProductPassport, Date>>() {
+            
+            //Взято из: http://code.makery.ch/blog/javafx-2-tableview-cell-renderer/
+            @Override
+            public TableCell<ProductPassport, Date> call(TableColumn<ProductPassport, Date> p) {
+                return new TableCell<ProductPassport, Date>() {
+                    @Override
+                    protected void updateItem(Date item, boolean empty) {
+                        super.updateItem(item, empty);
+                        
+                        if (!empty) {
+                            setText(new SimpleDateFormat("dd.MM.yyyy").format(item));
+                        } else {
+                            setText(null);
+                        }
+                    }
+                };
+            }
+        });
+        
+        colPartNumPass.setEditable(false);
+        colPartNumPass.setCellValueFactory(new PropertyValueFactory<ProductPassport, String>("partNum"));
+        
+        colProdNamePass.setEditable(false);
+        colProdNamePass.setCellValueFactory(new PropertyValueFactory<ProductPassport, Product>("product"));
+        
+        colDurabilityPass.setEditable(false);
+        colDurabilityPass.setCellValueFactory(new PropertyValueFactory<ProductPassport, Float>("avgDurability"));
+        colDurabilityPass.setCellFactory(new FloatPassCallback());
+        
+        colDensityPass.setEditable(false);
+        colDensityPass.setCellValueFactory(new PropertyValueFactory<ProductPassport, Float>("avgDensity"));
+        colDensityPass.setCellFactory(new FloatPassCallback());
+        
+        colNotesPass.setEditable(false);
+        colNotesPass.setCellValueFactory(new PropertyValueFactory<ProductPassport, String>("notes"));
+    }
+
+    /**
+     * Инициализация колонок в таблице tblRequiredDurability - статистика
+     * испытаний ГП.
      */
     private void InitDurabilityColumns() {
         colDurabilityMarkReq.setEditable(false);
         colDurabilityMarkReq.setCellValueFactory(new PropertyValueFactory<RequiredDurability, String>("name"));
-        
+
         colReqDurabilityReq.setEditable(false);
         colReqDurabilityReq.setCellValueFactory(new PropertyValueFactory<RequiredDurability, Float>("value"));
         colReqDurabilityReq.setCellFactory(new Callback<TableColumn<RequiredDurability, Float>, TableCell<RequiredDurability, Float>>() {
-            
+
             @Override
             public TableCell<RequiredDurability, Float> call(TableColumn<RequiredDurability, Float> p) {
                 return new TableCell<RequiredDurability, Float>() {
                     @Override
                     protected void updateItem(Float item, boolean empty) {
                         super.updateItem(item, empty);
-                        
+
                         //Устанавливаем выравнивание по правой стороне.
                         setAlignment(Pos.CENTER_RIGHT);
-                        
+
                         //Округляем до целого числа.
                         if (!empty) {
                             setText(item.toString());
@@ -417,12 +499,13 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
     }
 
     /**
-     * Инициализация колонок в таблице tblRequiredDensity - статистика испытаний ГП.
+     * Инициализация колонок в таблице tblRequiredDensity - статистика испытаний
+     * ГП.
      */
     private void InitDensityColumns() {
         colDensityMarkReq.setEditable(false);
         colDensityMarkReq.setCellValueFactory(new PropertyValueFactory<RequiredDensity, String>("name"));
-        
+
         colReqDensityReq.setEditable(false);
         colReqDensityReq.setCellValueFactory(new PropertyValueFactory<RequiredDensity, Integer>("value"));
     }
@@ -458,111 +541,37 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         colProdNameStat.setEditable(false);
         colProdNameStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("productName"));
 
-        //Обратный вызов для колонок с типом Float и необходимостью округления до целого.
-        //Не переводим на Int, так как не уверены, что следует всегда округлять.
-        Callback<TableColumn<Stat, Float>, TableCell<Stat, Float>> floatCallback = new Callback<TableColumn<Stat, Float>, TableCell<Stat, Float>>() {
-
-            @Override
-            public TableCell<Stat, Float> call(TableColumn<Stat, Float> p) {
-                return new TableCell<Stat, Float>() {
-                    @Override
-                    protected void updateItem(Float item, boolean empty) {
-                        super.updateItem(item, empty);
-
-                        //Устанавливаем выравнивание по правой стороне.
-                        setAlignment(Pos.CENTER_RIGHT);
-
-                        //Округляем до целого числа.
-                        if (!empty) {
-                            setText(String.valueOf(Math.round(item)));
-                        } else {
-                            setText(null);
-                        }
-                    }
-                };
-            }
-        };
-
-        //Обратный вызов для колонок с типом Float без округления.
-        //Не переводим на Int, так как не уверены, что следует всегда округлять.
-        Callback<TableColumn<Stat, Float>, TableCell<Stat, Float>> floatCallbackWoRound = new Callback<TableColumn<Stat, Float>, TableCell<Stat, Float>>() {
-
-            @Override
-            public TableCell<Stat, Float> call(TableColumn<Stat, Float> p) {
-                return new TableCell<Stat, Float>() {
-                    @Override
-                    protected void updateItem(Float item, boolean empty) {
-                        super.updateItem(item, empty);
-
-                        //Устанавливаем выравнивание по правой стороне.
-                        setAlignment(Pos.CENTER_RIGHT);
-
-                        //Округляем до целого числа.
-                        if (!empty) {
-                            setText(item.toString());
-                        } else {
-                            setText(null);
-                        }
-                    }
-                };
-            }
-        };
-
-        //Обратный вызов для колонок с типом String.
-        Callback<TableColumn<Stat, String>, TableCell<Stat, String>> stringCallback = new Callback<TableColumn<Stat, String>, TableCell<Stat, String>>() {
-
-            @Override
-            public TableCell<Stat, String> call(TableColumn<Stat, String> p) {
-                return new TableCell<Stat, String>() {
-                    @Override
-                    protected void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-
-                        //Устанавливаем выравнивание по правой стороне.
-                        setAlignment(Pos.CENTER);
-
-                        //Округляем до целого числа.
-                        if (!empty) {
-                            setText(item);
-                        } else {
-                            setText(null);
-                        }
-                    }
-                };
-            }
-        };
-
         colReqDensityStat.setEditable(false);
         colReqDensityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("reqDensity"));
-        colReqDensityStat.setCellFactory(floatCallback);
+        colReqDensityStat.setCellFactory(new FloatStatCallback());
 
         colReqDurabilityStat.setEditable(false);
         colReqDurabilityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("reqDurability"));
-        colReqDurabilityStat.setCellFactory(floatCallback);
+        colReqDurabilityStat.setCellFactory(new FloatStatCallback());
 
         colDryDensityStat.setEditable(false);
         colDryDensityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("avgDryDensity"));
-        colDryDensityStat.setCellFactory(floatCallback);
+        colDryDensityStat.setCellFactory(new FloatStatCallback());
 
         colDensityMarkStat.setEditable(false);
         colDensityMarkStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("densityMark"));
-        colDensityMarkStat.setCellFactory(stringCallback);
+        colDensityMarkStat.setCellFactory(new StringStatCallback());
 
         colDensityVariationStat.setEditable(false);
         colDensityVariationStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("densityVariation"));
-        colDensityVariationStat.setCellFactory(floatCallbackWoRound);
+        colDensityVariationStat.setCellFactory(new FloatStatWORoundCallback());
 
         colDurabilityStat.setEditable(false);
         colDurabilityStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("avgDurability"));
-        colDurabilityStat.setCellFactory(floatCallback);
+        colDurabilityStat.setCellFactory(new FloatStatCallback());
 
         colDurabilityMarkStat.setEditable(false);
         colDurabilityMarkStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("durabilityMark"));
-        colDurabilityMarkStat.setCellFactory(stringCallback);
+        colDurabilityMarkStat.setCellFactory(new StringStatCallback());
 
         colDurabilityVarStat.setEditable(false);
         colDurabilityVarStat.setCellValueFactory(new PropertyValueFactory<Stat, Float>("durabilityVariation"));
-        colDurabilityVarStat.setCellFactory(floatCallbackWoRound);
+        colDurabilityVarStat.setCellFactory(new FloatStatWORoundCallback());
 
         colPersonStat.setEditable(false);
         colPersonStat.setCellValueFactory(new PropertyValueFactory<Stat, String>("personName"));
@@ -930,6 +939,37 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
                     return;
                 }
             }
+        }
+    }
+
+    @FXML
+    private void tabPassportsOnSelectionChanged(Event event) {
+        if(tabPassports.isSelected()){
+            //Инициализируем элементы управления при заходе на вкладку.
+        if (comboMonthPass.getItems().size() == 0) {
+            comboMonthPass.setItems(blogic.getMonths());
+            comboMonthPass.valueProperty().bindBidirectional(blogic.selectedMonthPassProperty());
+            comboMonthPass.getSelectionModel().select(Calendar.getInstance().get(Calendar.MONTH) + 1);  //Устанавливаем текущий месяц.
+            
+            //Устанавливаем текст по-умлочанию для таблицы с паспортами.
+            tblPassports.setPlaceholder(new Text("Реестр паспортов ГП"));
+            
+            //Связываем количество строк в таблице с элементом управления.
+            tblPassportsItemsCount.textProperty().bindBidirectional(blogic.tblPassportsItemsCountProperty(), new NumberStringConverter());
+        }
+
+        if (comboYearPass.getItems().size() == 0) {            
+            comboYearPass.setItems(blogic.getYears());
+            comboYearPass.valueProperty().bindBidirectional(blogic.selectedYearPassProperty());
+            
+            int currentYear = Calendar.getInstance().get(Calendar.YEAR);                            
+            for (Year y : blogic.getYears()) {                                                           
+                if (y.getReturnValue() == currentYear) {                                                   
+                    comboYearPass.getSelectionModel().select(y);                                    
+                    break;                                                                          
+                }                                                                                   
+            }
+        }
         }
     }
 

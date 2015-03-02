@@ -26,6 +26,7 @@ import producttest.model.Person;
 import producttest.model.SampleTest;
 import producttest.model.TestReport;
 import producttest.model.Product;
+import producttest.model.ProductPassport;
 import producttest.model.RequiredDensity;
 import producttest.model.RequiredDurability;
 import producttest.model.Stat;
@@ -60,6 +61,9 @@ public class DataContext {
     private String url = "jdbc:oracle:thin:@192.168.1.37:1521:xe";
     private String username = "SUPP";
     private String password = "@!Oracle01";
+
+    //Список продукции для кэша.
+    ArrayList<Product> products;
 
     /**
      * Конструктор класса по-умолчанию.
@@ -663,11 +667,17 @@ public class DataContext {
      * @throws java.sql.SQLException
      */
     public ArrayList<Product> getProducts() throws SQLException {
+
+        //Если список продуктов уже загружен, то просто возвращаем его.
+        if (products != null && products.size() > 0) {
+            return products;
+        }
+
         if (connection == null) {
             return null;
         }
 
-        ArrayList<Product> retVal = new ArrayList<>();   //Возвращаемое значение.
+        products = new ArrayList<>();   //Возвращаемое значение.
 
         Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
@@ -680,11 +690,11 @@ public class DataContext {
                 p.setId(rset.getInt("id"));
                 p.setName(rset.getString("name"));
                 p.setDensity(rset.getInt("density"));
-                retVal.add(p);
+                products.add(p);
             }
         }
 
-        return retVal;
+        return products;
     }
 
     //--------------------------------------------------------------------------
@@ -741,6 +751,7 @@ public class DataContext {
         return retVal;
     }
 
+    //<editor-fold defaultstate="collapsed" desc="Статистика испытаний ГП">
     /**
      * Возвращает статистику испытаний ГП
      *
@@ -978,6 +989,74 @@ public class DataContext {
 
         return retVal;
     }
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="Реестр паспортов ГП">
+    /**
+     * Возвращает список пасспортов по указанным критериям.
+     * @param month - месяц (не обязательно)
+     * @param year - год (обязательно).
+     * @return
+     * @throws SQLException 
+     */
+    public ArrayList<ProductPassport> getProductPassports(Month month, Year year) throws SQLException, ParseException {
+        ArrayList<ProductPassport> retVal = new ArrayList<>();   //Возвращаемое значение.
+
+        if (connection == null) {
+            return retVal;
+        }
+
+        if (year == null || year.getReturnValue() == 0) {
+            return retVal;
+        }
+
+        Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+        String monthWhere = (month != null && month.getName() != null) ? " AND EXTRACT (MONTH FROM DAY) = " + month.getId() + " " : "";
+
+        String query = String.format("SELECT ID, PART_NO, TO_CHAR(DAY, 'dd.mm.yyyy') DAY, PRODUCT_ID, COMPRESS_STRENGTH,\n"
+                + "  REQ_STRENGTH, AVG_DENSITY, STEAM_FACTOR, FROST_RESIST,\n"
+                + "  HEAT_CONDUCTION, SHRINKAGE, ACTIVITY, NOTES, STRENGTH_CLASS,\n"
+                + "  HUMIDITY FROM T_Q_PASS WHERE EXTRACT(YEAR FROM DAY) = %d", year.getReturnValue());
+
+        query += monthWhere + " ORDER BY DAY DESC";
+
+        try (ResultSet rset = stmt.executeQuery(query)) {
+            while (rset.next()) {
+                ProductPassport pp = new ProductPassport();
+                pp.setId(rset.getInt("ID"));
+                pp.setPartNum(rset.getString("PART_NO"));
+                
+                DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+                Date d = df.parse(rset.getString("DAY"));
+                pp.setDate(d);
+                
+                for(Product p : getProducts()){
+                    if (p.getId() == rset.getInt("PRODUCT_ID")) {
+                        pp.setProduct(p);
+                        break;
+                    }
+                }
+                
+                pp.setAvgDurability(rset.getFloat("COMPRESS_STRENGTH"));
+                pp.setReqDurability(rset.getFloat("REQ_STRENGTH"));
+                pp.setAvgDensity(rset.getFloat("AVG_DENSITY"));
+                pp.setSteamFactor(rset.getFloat("STEAM_FACTOR"));
+                pp.setFrostResist(rset.getString("FROST_RESIST"));
+                pp.setHeatConduction(rset.getFloat("HEAT_CONDUCTION"));
+                pp.setShrinkage(rset.getFloat("SHRINKAGE"));
+                pp.setActivity(rset.getString("ACTIVITY"));
+                pp.setNotes(rset.getString("NOTES"));
+                pp.setDurabilityMark(rset.getString("STRENGTH_CLASS"));
+                pp.setHymidity(rset.getFloat("HUMIDITY"));
+                
+                retVal.add(pp);
+            }
+        }
+
+        return retVal;
+    }
+    //</editor-fold>
 
     //--------------------- Вспомогательные -------------------------------- //
     int currentDensity = 0;     //Хранит информацию о плотности с момента последнего запроса.
