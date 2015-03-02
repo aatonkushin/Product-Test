@@ -10,7 +10,9 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,7 +47,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -285,7 +286,18 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         comboPartNumStat.valueProperty().bindBidirectional(blogic.selectedPartNumStatProperty());
         comboProdNameStat.valueProperty().bindBidirectional(blogic.selectedProdNameStatProperty());
         comboMonthStat.valueProperty().bindBidirectional(blogic.selectedMonthStatProperty());
+        comboMonthStat.setItems(blogic.getMonths());
+        comboMonthStat.getSelectionModel().select(Calendar.getInstance().get(Calendar.MONTH)+1);  //Устанавливаем текущий месяц на вкладке статистики ГП.
         comboYearStat.valueProperty().bindBidirectional(blogic.selectedYearStatProperty());
+        comboYearStat.setItems(blogic.getYears());                                              //Устанавливаем текущий год на вкладке статистики ГП.
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);                            //
+        for(Year y : blogic.getYears()){                                                        //    
+            if (y.getReturnValue() == currentYear) {                                            //        
+                comboYearStat.getSelectionModel().select(y);                                    //
+                break;                                                                          //
+            }                                                                                   //
+        }                                                                                       //
+        
         comboDensityMarkStat.valueProperty().bindBidirectional(blogic.selectedDensityMarkStatProperty());
         comboDurabilityMarkStat.valueProperty().bindBidirectional(blogic.selectedDurabilityMarkStatProperty());
         tblStatisticsItemsCount.textProperty().bindBidirectional(blogic.tblStatisticsItemsCountProperty(), new NumberStringConverter());
@@ -297,14 +309,10 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         InitHumidityColumns();
         InitResultsColumns();
         InitStatColumns();
-        
-        colDensityMarkReq.setEditable(false);
-        colDensityMarkReq.setCellValueFactory(new PropertyValueFactory<RequiredDensity, String>("name"));
-        
-        colReqDensityReq.setEditable(false);
-        colReqDensityReq.setCellValueFactory(new PropertyValueFactory<RequiredDensity, Integer>("value"));
-        
+        InitDensityColumns();
+        InitDurabilityColumns();
 
+        //Устанавлеваем подписи для пустых таблиц.
         tblSample.setPlaceholder(new Text("Испытание образцов"));
         tblHumidity.setPlaceholder(new Text("Оценка влажности"));
         tblResults.setPlaceholder(new Text("Результаты испытаний"));
@@ -320,6 +328,7 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         tblResults.setItems(blogic.getResults());
         tblStatistics.setItems(blogic.getProductTestStatistics());
         tblRequiredDensity.setItems(blogic.getRequiredDensities());
+        tblRequiredDurability.setItems(blogic.getRequiredDurabilities());
 
         txtFooterRowStart.setMinWidth(colSampleNumResults.getPrefWidth());
         txtFooterRowStart.setMaxWidth(colSampleNumResults.getPrefWidth());
@@ -372,6 +381,50 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
 
         //Устанавливаем ро, так как из SceneBuilder не получается.
         lblRho.setText("\u03c1");
+    }
+
+    /**
+     * Инициализация колонок в таблице tblRequiredDurability - статистика испытаний ГП.
+     */
+    private void InitDurabilityColumns() {
+        colDurabilityMarkReq.setEditable(false);
+        colDurabilityMarkReq.setCellValueFactory(new PropertyValueFactory<RequiredDurability, String>("name"));
+        
+        colReqDurabilityReq.setEditable(false);
+        colReqDurabilityReq.setCellValueFactory(new PropertyValueFactory<RequiredDurability, Float>("value"));
+        colReqDurabilityReq.setCellFactory(new Callback<TableColumn<RequiredDurability, Float>, TableCell<RequiredDurability, Float>>() {
+            
+            @Override
+            public TableCell<RequiredDurability, Float> call(TableColumn<RequiredDurability, Float> p) {
+                return new TableCell<RequiredDurability, Float>() {
+                    @Override
+                    protected void updateItem(Float item, boolean empty) {
+                        super.updateItem(item, empty);
+                        
+                        //Устанавливаем выравнивание по правой стороне.
+                        setAlignment(Pos.CENTER_RIGHT);
+                        
+                        //Округляем до целого числа.
+                        if (!empty) {
+                            setText(item.toString());
+                        } else {
+                            setText(null);
+                        }
+                    }
+                };
+            }
+        });
+    }
+
+    /**
+     * Инициализация колонок в таблице tblRequiredDensity - статистика испытаний ГП.
+     */
+    private void InitDensityColumns() {
+        colDensityMarkReq.setEditable(false);
+        colDensityMarkReq.setCellValueFactory(new PropertyValueFactory<RequiredDensity, String>("name"));
+        
+        colReqDensityReq.setEditable(false);
+        colReqDensityReq.setCellValueFactory(new PropertyValueFactory<RequiredDensity, Integer>("value"));
     }
 
     /**
@@ -430,7 +483,7 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
             }
         };
 
-        //Обратный вызов для колонок с типом Float.
+        //Обратный вызов для колонок с типом Float без округления.
         //Не переводим на Int, так как не уверены, что следует всегда округлять.
         Callback<TableColumn<Stat, Float>, TableCell<Stat, Float>> floatCallbackWoRound = new Callback<TableColumn<Stat, Float>, TableCell<Stat, Float>>() {
 
@@ -838,8 +891,8 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
             //Заполняем номера партий.
             comboPartNumStat.setItems(blogic.getPartNumbers());
             comboProdNameStat.setItems(blogic.getProducts());
-            comboMonthStat.setItems(blogic.getMonths());
-            comboYearStat.setItems(blogic.getYears());
+            //comboMonthStat.setItems(blogic.getMonths());
+            //comboYearStat.setItems(blogic.getYears());
             comboDensityMarkStat.setItems(blogic.getDensityMarks());
             comboDurabilityMarkStat.setItems(blogic.getDurabilityMarks());
         }

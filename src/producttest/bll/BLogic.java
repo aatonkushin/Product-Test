@@ -1307,7 +1307,7 @@ public class BLogic {
     }
 
     /**
-     * Обновляет вкладку статистики испытаний ГП.
+     * Обновляет вкладку статистики испытаний ГП (nтаблицы Требуемая прочность и Требуемая плотность).
      */
     private void updateRequiredDensityAndDurabilityStatistics() {
         try {
@@ -1316,7 +1316,15 @@ public class BLogic {
                 requiredDensities = FXCollections.observableArrayList();
             }
 
+            requiredDensities.clear();
             requiredDensities.addAll(dc.getRequiredDensities(getSelectedMonthStat(), getSelectedYearStat()));
+            
+            if(requiredDurabilities == null){
+                requiredDurabilities = FXCollections.observableArrayList();
+            }
+            
+            requiredDurabilities.clear();
+            requiredDurabilities.addAll(dc.getRequiredDurabilities(getSelectedMonthStat(), getSelectedYearStat()));
             
         } catch (SQLException ex) {
             System.err.println(ex);

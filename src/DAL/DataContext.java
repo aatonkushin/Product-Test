@@ -924,7 +924,7 @@ public class DataContext {
         Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
         String query = String.format("SELECT DISTINCT(DENSITY_MARK) DENSITY_MARK,\n"
-                + " SUPP_PKG.GET_REQ_DENSITY(%d, %d, DENSITY_MARK) P\n"
+                + " SUPP_PKG.GET_REQ_DENSITY(%d - 1, %d, DENSITY_MARK) P\n"
                 + " FROM T_Q_ST ORDER BY DENSITY_MARK", month.getId(), year.getReturnValue());
 
         try (ResultSet rset = stmt.executeQuery(query)) {
@@ -961,16 +961,18 @@ public class DataContext {
         Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
         String query = String.format("SELECT DISTINCT(DURABILITY_MARK) DM,\n"
-                + " SUPP_PKG.GET_REQ_DURABILITY(%d, %d, DURABILITY_MARK) P\n"
+                + " SUPP_PKG.GET_REQ_DURABILITY(%d - 1, %d, DURABILITY_MARK) P\n"
                 + " FROM T_Q_ST\n"
                 + " ORDER BY DURABILITY_MARK", month.getId(), year.getReturnValue());
 
         try (ResultSet rset = stmt.executeQuery(query)) {
             while (rset.next()) {
                 RequiredDurability rd = new RequiredDurability();
-                rd.setName(rset.getString("DURABILITY_MARK"));
+                rd.setName(rset.getString("DM"));
                 rd.setValue(rset.getFloat("P"));
-                retVal.add(rd);
+                if (rd.getName() != null && !rd.getName().equals("")) {
+                    retVal.add(rd);
+                }
             }
         }
 
