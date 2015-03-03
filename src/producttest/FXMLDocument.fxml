@@ -11,11 +11,11 @@
 
 <AnchorPane id="AnchorPane" prefWidth="980.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="producttest.FXMLDocumentController">
     <children>
-      <TabPane fx:id="tabPane" prefHeight="687.0" prefWidth="975.0" side="LEFT" tabClosingPolicy="UNAVAILABLE">
+      <TabPane fx:id="tabPane" prefHeight="689.0" prefWidth="975.0" side="LEFT" tabClosingPolicy="UNAVAILABLE">
         <tabs>
           <Tab fx:id="tabProductTest" text="Испытания ГП">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <AnchorPane maxHeight="690.0" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
                           <VBox prefWidth="940.0">
                               <children>
@@ -282,7 +282,7 @@
                                   </VBox>
                                   <HBox alignment="CENTER_RIGHT" prefWidth="200.0" spacing="5.0">
                                       <children>
-                                          <HBox alignment="CENTER_LEFT" prefHeight="25.0" prefWidth="856.0" spacing="5.0">
+                                          <HBox alignment="CENTER_LEFT" prefWidth="856.0" spacing="5.0">
                                               <children>
                                                   <HBox prefWidth="200.0">
                                                       <children>
@@ -306,7 +306,7 @@
                                                   <Insets top="5.0" />
                                               </padding>
                                           </HBox>
-                                          <HBox prefHeight="25.0">
+                                          <HBox>
                                               <children>
                                                   <Button fx:id="btnAccept" mnemonicParsing="false" onAction="#btnAcceptOnAction" prefHeight="25.0" text="Сохранить">
                                              <HBox.margin>
@@ -460,8 +460,8 @@
                               </HBox>
                               <HBox prefWidth="200.0" spacing="5.0">
                                  <children>
-                                    <Button fx:id="btnAddPass" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="Добавить" />
-                                    <Button fx:id="btnChangePass" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="Изменить" />
+                                    <Button fx:id="btnAddPass" mnemonicParsing="false" onAction="#btnAddPassOnAction" prefHeight="25.0" prefWidth="80.0" text="Добавить" />
+                                    <Button fx:id="btnChangePass" mnemonicParsing="false" onAction="#btnChangePassOnAction" prefHeight="25.0" prefWidth="80.0" text="Изменить" />
                                     <Button fx:id="btnDeletePass" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="Удалить" />
                                     <Button fx:id="btnPrintPass" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="Печать">
                                        <HBox.margin>
@@ -473,7 +473,7 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                  </padding>
                               </HBox>
-                              <TableView fx:id="tblPassports" prefHeight="570.0" prefWidth="200.0">
+                              <TableView fx:id="tblPassports" onMouseClicked="#tblPassportsOnMouseClicked" prefHeight="570.0" prefWidth="200.0">
                                 <columns>
                                   <TableColumn fx:id="colDatePass" prefWidth="75.0" text="Дата" />
                                   <TableColumn fx:id="colPartNumPass" prefWidth="95.0" text="№ партии" />

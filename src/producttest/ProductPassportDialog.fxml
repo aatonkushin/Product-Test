@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
@@ -7,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="480.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="producttest.ProductPassportDialogController">
+<AnchorPane id="AnchorPane" prefHeight="470.0" prefWidth="480.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="producttest.ProductPassportDialogController">
    <children>
       <GridPane layoutX="217.0" layoutY="126.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
         <columnConstraints>
@@ -59,8 +60,75 @@
             <Label text="Усадка при высыхании" GridPane.rowIndex="11" />
             <Label text="Удельная эффективная&#10;активность ЕРН" GridPane.rowIndex="12" />
             <Label text="Примечание" GridPane.rowIndex="13" />
-            <ComboBox prefWidth="150.0" GridPane.columnIndex="1" />
-            <ComboBox prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <ComboBox fx:id="comboPartNum" onAction="#comboPartNumOnChange" prefWidth="188.0" GridPane.columnIndex="1" />
+            <ComboBox fx:id="comboProduct" prefWidth="188.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <DatePicker fx:id="datePicker" prefWidth="188.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="txtAvgDurability" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="txtAvgDensity" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <TextField fx:id="txtHumidity" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <TextField fx:id="txtDurabilityMark" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <TextField fx:id="txtReqDurability" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+            <TextField fx:id="txtSteamFactor" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+            <TextField fx:id="txtFrostresist" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+            <TextField fx:id="txtHeatConduction" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+            <TextField GridPane.columnIndex="1" GridPane.rowIndex="11" />
+            <TextField fx:id="txtShrinkage" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+            <TextField fx:id="txtActivity" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+            <TextField fx:id="txtNotes" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="13" />
+            <Label text="кгс/см.кв." GridPane.columnIndex="2" GridPane.rowIndex="3">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </Label>
+            <Label text="кг/м.куб." GridPane.columnIndex="2" GridPane.rowIndex="4">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </Label>
+            <Label text="\%" GridPane.columnIndex="2" GridPane.rowIndex="5">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </Label>
+            <Label text="кгс/см.кв." GridPane.columnIndex="2" GridPane.rowIndex="7">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </Label>
+            <Label text="мг/м ч Па" GridPane.columnIndex="2" GridPane.rowIndex="8">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </Label>
+            <Label text="Вт/м 0С" GridPane.columnIndex="2" GridPane.rowIndex="10">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </Label>
+            <Label text="мм/м" GridPane.columnIndex="2" GridPane.rowIndex="11">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </Label>
+            <Label text="Бк/кг" GridPane.columnIndex="2" GridPane.rowIndex="12">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </Label>
+            <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="14">
+               <children>
+                  <Button fx:id="btnOk" mnemonicParsing="false" onAction="#btnOkOnAction" prefHeight="25.0" prefWidth="80.0" text="ОК">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="btnCancel" mnemonicParsing="false" onAction="#btnCancelOnAction" prefHeight="25.0" prefWidth="80.0" text="Отмена">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+            </HBox>
          </children>
       </GridPane>
    </children>

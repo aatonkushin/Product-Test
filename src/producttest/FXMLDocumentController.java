@@ -42,10 +42,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -427,7 +429,7 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         colDatePass.setEditable(false);
         colDatePass.setCellValueFactory(new PropertyValueFactory<ProductPassport, Date>("date"));
         colDatePass.setCellFactory(new Callback<TableColumn<ProductPassport, Date>, TableCell<ProductPassport, Date>>() {
-            
+
             //Взято из: http://code.makery.ch/blog/javafx-2-tableview-cell-renderer/
             @Override
             public TableCell<ProductPassport, Date> call(TableColumn<ProductPassport, Date> p) {
@@ -435,7 +437,7 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
                     @Override
                     protected void updateItem(Date item, boolean empty) {
                         super.updateItem(item, empty);
-                        
+
                         if (!empty) {
                             setText(new SimpleDateFormat("dd.MM.yyyy").format(item));
                         } else {
@@ -445,21 +447,21 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
                 };
             }
         });
-        
+
         colPartNumPass.setEditable(false);
         colPartNumPass.setCellValueFactory(new PropertyValueFactory<ProductPassport, String>("partNum"));
-        
+
         colProdNamePass.setEditable(false);
         colProdNamePass.setCellValueFactory(new PropertyValueFactory<ProductPassport, Product>("product"));
-        
+
         colDurabilityPass.setEditable(false);
         colDurabilityPass.setCellValueFactory(new PropertyValueFactory<ProductPassport, Float>("avgDurability"));
         colDurabilityPass.setCellFactory(new FloatPassCallback());
-        
+
         colDensityPass.setEditable(false);
         colDensityPass.setCellValueFactory(new PropertyValueFactory<ProductPassport, Float>("avgDensity"));
         colDensityPass.setCellFactory(new FloatPassCallback());
-        
+
         colNotesPass.setEditable(false);
         colNotesPass.setCellValueFactory(new PropertyValueFactory<ProductPassport, String>("notes"));
     }
@@ -944,32 +946,75 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
 
     @FXML
     private void tabPassportsOnSelectionChanged(Event event) {
-        if(tabPassports.isSelected()){
+        if (tabPassports.isSelected()) {
             //Инициализируем элементы управления при заходе на вкладку.
-        if (comboMonthPass.getItems().size() == 0) {
-            comboMonthPass.setItems(blogic.getMonths());
-            comboMonthPass.valueProperty().bindBidirectional(blogic.selectedMonthPassProperty());
-            comboMonthPass.getSelectionModel().select(Calendar.getInstance().get(Calendar.MONTH) + 1);  //Устанавливаем текущий месяц.
-            
-            //Устанавливаем текст по-умлочанию для таблицы с паспортами.
-            tblPassports.setPlaceholder(new Text("Реестр паспортов ГП"));
-            
-            //Связываем количество строк в таблице с элементом управления.
-            tblPassportsItemsCount.textProperty().bindBidirectional(blogic.tblPassportsItemsCountProperty(), new NumberStringConverter());
-        }
+            if (comboMonthPass.getItems().size() == 0) {
+                comboMonthPass.setItems(blogic.getMonths());
+                comboMonthPass.valueProperty().bindBidirectional(blogic.selectedMonthPassProperty());
+                comboMonthPass.getSelectionModel().select(Calendar.getInstance().get(Calendar.MONTH) + 1);  //Устанавливаем текущий месяц.
 
-        if (comboYearPass.getItems().size() == 0) {            
-            comboYearPass.setItems(blogic.getYears());
-            comboYearPass.valueProperty().bindBidirectional(blogic.selectedYearPassProperty());
-            
-            int currentYear = Calendar.getInstance().get(Calendar.YEAR);                            
-            for (Year y : blogic.getYears()) {                                                           
-                if (y.getReturnValue() == currentYear) {                                                   
-                    comboYearPass.getSelectionModel().select(y);                                    
-                    break;                                                                          
-                }                                                                                   
+                //Устанавливаем текст по-умлочанию для таблицы с паспортами.
+                tblPassports.setPlaceholder(new Text("Реестр паспортов ГП"));
+
+                //Связываем количество строк в таблице с элементом управления.
+                tblPassportsItemsCount.textProperty().bindBidirectional(blogic.tblPassportsItemsCountProperty(), new NumberStringConverter());
+            }
+
+            if (comboYearPass.getItems().size() == 0) {
+                comboYearPass.setItems(blogic.getYears());
+                comboYearPass.valueProperty().bindBidirectional(blogic.selectedYearPassProperty());
+
+                int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+                for (Year y : blogic.getYears()) {
+                    if (y.getReturnValue() == currentYear) {
+                        comboYearPass.getSelectionModel().select(y);
+                        break;
+                    }
+                }
             }
         }
+    }
+
+    @FXML
+    private void btnAddPassOnAction(ActionEvent event) {
+        OpenPassportDialog(new ProductPassport());
+    }
+
+    @FXML
+    private void btnChangePassOnAction(ActionEvent event) {
+        if (tblPassports.getSelectionModel().getSelectedItem() != null) {
+            OpenPassportDialog(tblPassports.getSelectionModel().getSelectedItem());
+        }
+    }
+
+    private void OpenPassportDialog(ProductPassport pp) {
+        FXMLLoader root;
+        try {
+            root = new FXMLLoader(getClass().getResource("ProductPassportDialog.fxml"));
+            Stage stage = new Stage();
+            stage.setTitle("Добавление паспорта ГП");
+            stage.setResizable(false);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            Image img = new Image(getClass().getResourceAsStream("logo.png"));
+            stage.getIcons().add(img);
+            stage.setScene(new Scene((Pane) root.load()));
+
+            ProductPassportDialogController ppdc = root.<ProductPassportDialogController>getController();
+            ppdc.initData(pp, blogic.getPartNumbers(), blogic.getProducts());
+
+            stage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void tblPassportsOnMouseClicked(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            if (tblPassports.getSelectionModel().getSelectedItem() != null) {
+                OpenPassportDialog(tblPassports.getSelectionModel().getSelectedItem());
+            }
         }
     }
 

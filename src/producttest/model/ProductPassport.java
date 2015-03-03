@@ -237,4 +237,12 @@ public class ProductPassport {
     public void setNotes(String notes) {
         this.notes = notes;
     }
+    
+    /**
+     * Конструктор класса по умолчанию.
+     * Инициализирует id = -1
+     */
+    public ProductPassport(){
+        setId(-1);
+    }
 }

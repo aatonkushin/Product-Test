@@ -1480,7 +1480,7 @@ public class BLogic {
             //Подключение к БД.
             dc = new DataContext();
             dc.connect();
-            partNumbers = FXCollections.observableArrayList(dc.GetPartNumbers());
+            partNumbers = FXCollections.observableArrayList(dc.getParts());
             partNumbers.set(0, new Part());
 
             personal = FXCollections.observableArrayList(dc.GetPersonal());

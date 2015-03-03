@@ -106,8 +106,8 @@ public class DataContext {
      * @throws SQLException
      * @throws java.text.ParseException
      */
-    public ArrayList<Part> GetPartNumbers() throws SQLException, ParseException {
-        ArrayList<Part> retVal = new ArrayList<>(100);
+    public ArrayList<Part> getParts() throws SQLException, ParseException {
+        ArrayList<Part> retVal = new ArrayList<>();
 
         if (connection == null) {
             return retVal;
