@@ -750,8 +750,23 @@ public class DataContext {
 
         return retVal;
     }
+    
+   
 
     //<editor-fold defaultstate="collapsed" desc="Статистика испытаний ГП">
+    
+    /**
+     * Возвращает статистику испытаний ГП
+     *
+     * @param part - партия
+     * @param year - год
+     * @return
+     * @throws SQLException
+     * @throws ParseException
+     */
+     public ArrayList<Stat> getProductTestStatistics(Part part, Year year) throws SQLException, ParseException{
+        return this.getProductTestStatistics(part, null, null, year, "", "");
+    }
     /**
      * Возвращает статистику испытаний ГП
      *
@@ -829,6 +844,7 @@ public class DataContext {
                 st.setDurabilityMark(rset.getString("DURABILITY_MARK"));
                 st.setDurabilityVariation(rset.getFloat("DURABILITY_VARIATION"));
                 st.setPersonName(rset.getString("PERSON_NAME"));
+                st.setHumidity(rset.getFloat("HUMIDITY"));
                 retVal.add(st);
             }
         }

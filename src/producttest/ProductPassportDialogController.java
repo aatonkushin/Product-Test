@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
@@ -23,9 +25,13 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javax.annotation.processing.RoundEnvironment;
+import producttest.bll.BLogic;
 import producttest.model.Part;
 import producttest.model.Product;
 import producttest.model.ProductPassport;
+import producttest.model.Stat;
+import producttest.model.Year;
 
 /**
  * FXML Controller class
@@ -65,12 +71,19 @@ public class ProductPassportDialogController implements Initializable {
     private Button btnOk;
     @FXML
     private Button btnCancel;
+    
+    BLogic blogic;
+    ProductPassport productPassport;
 
-    public void initData(ProductPassport productPassport, ObservableList<Part> parts, ObservableList<Product> products){
+    public void initData(ProductPassport productPassport, BLogic blogic){
+        
+        this.productPassport = productPassport;
+        this.blogic = blogic;
+        
         Locale.setDefault(new Locale("ru"));    //Из за datePicker'a, но вообще, нужно было в начале установить ru в ProductTest.java
         
-        comboPartNum.setItems(parts);
-        comboProduct.setItems(products);
+        comboPartNum.setItems(blogic.getPartNumbers());
+        comboProduct.setItems(blogic.getProducts());
         
         if (productPassport.getId() != -1) {
             comboProduct.getSelectionModel().select(productPassport.getProduct());
@@ -127,12 +140,40 @@ public class ProductPassportDialogController implements Initializable {
 
     @FXML
     private void comboPartNumOnChange(ActionEvent event) {
+        
+        if(comboPartNum.getSelectionModel().getSelectedIndex() == 0){
+            return;
+        }
+        
+        //Устанавливаем тип продукции.
         for(Product product: comboProduct.getItems()){
             if (product.getId() == comboPartNum.getSelectionModel().getSelectedItem().getProductId()) {
                 comboProduct.getSelectionModel().select(product);
                 break;
             }
         }
+        
+        //Получаем данные по испытаниям.
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(comboPartNum.getSelectionModel().getSelectedItem().getDateTime());
+        Year y = new Year();
+        y.setReturnValue(cal.get(Calendar.YEAR));
+        y.setDisplayValue(String.valueOf(y.getReturnValue()));
+        
+        ArrayList<Stat> stats = blogic.getProductStatsByPartYear(comboPartNum.getSelectionModel().getSelectedItem(), y);
+        
+        if (stats == null || stats.isEmpty()) {
+            return;
+        }
+        
+        Stat stat = stats.get(0);
+        
+        //Устанавливаем полученные значения в элементы управления.
+        txtAvgDurability.setText(String.valueOf(Math.round(stat.getAvgDurability())));
+        txtAvgDensity.setText(String.valueOf(Math.round(stat.getAvgDryDensity())));
+        txtHumidity.setText(String.valueOf(stat.getHumidity()));
+        txtDurabilityMark.setText(stat.getDurabilityMark());
+        txtReqDurability.setText(String.valueOf(stat.getReqDurability()));
     }
     
     

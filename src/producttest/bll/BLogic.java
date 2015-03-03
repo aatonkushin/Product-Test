@@ -1648,4 +1648,19 @@ public class BLogic {
             hl.onValueChanged("AddMeasureName2", addMeasureName);
         }
     }
+    
+    /**
+     * Возвращает список партий с указанным номером и годом.
+     * @param part - партия
+     * @param year - год
+     * @return 
+     */
+    public ArrayList<Stat> getProductStatsByPartYear(Part part, Year year){
+        try {
+            return dc.getProductTestStatistics(part, year);
+        } catch (SQLException | ParseException ex) {
+            Logger.getLogger(BLogic.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
 }

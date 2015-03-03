@@ -1000,7 +1000,7 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
             stage.setScene(new Scene((Pane) root.load()));
 
             ProductPassportDialogController ppdc = root.<ProductPassportDialogController>getController();
-            ppdc.initData(pp, blogic.getPartNumbers(), blogic.getProducts());
+            ppdc.initData(pp, blogic);
 
             stage.showAndWait();
 
