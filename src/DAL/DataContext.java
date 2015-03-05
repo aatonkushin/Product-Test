@@ -646,7 +646,7 @@ public class DataContext {
         String query = String.format("SELECT DURABILITY_VARIATION variation "
                 + "FROM T_Q_ST, T_PRODUCT "
                 + "WHERE T_Q_ST.PRODUCT_ID = T_PRODUCT.ID and T_PRODUCT.DENSITY = %d "
-                + "and T_Q_ST.TEST_DATE BETWEEN TO_DATE('%s', 'dd.MM.YYYY') AND TO_DATE('%s', 'dd.MM.YYYY') and rownum < 31 AND APPLY_RATIOS = 1 "
+                + "and T_Q_ST.PART_DATE BETWEEN TO_DATE('%s', 'dd.MM.YYYY') AND TO_DATE('%s', 'dd.MM.YYYY') and APPLY_RATIOS = 1 "
                 + "order by T_Q_ST.PART_DATE DESC",
                 density, df.format(start.getTime()), df.format(end.getTime()));
 
@@ -657,7 +657,7 @@ public class DataContext {
             }
         }
         //System.out.println("Result: " + retVal.size());
-        return retVal;
+         return retVal;
     }
 
     /**
@@ -898,7 +898,7 @@ public class DataContext {
      *
      * @param part - партия
      * @param product - продукция
-     * @param month - месяцж
+     * @param month - месяц (коэффициэнт вариации расчитывается по месяцу, идущему перед этим.)
      * @param year - год
      * @param density - плотность
      * @param durability - прочность
@@ -908,19 +908,28 @@ public class DataContext {
     public float getDurabilityVariationStat(Part part, Product product, Month month, Year year, String density, String durability) throws SQLException {
         float retVal = 0;
 
-        if (connection == null || durability == null || durability.equals("")) {
+        if (connection == null || density == null || density.isEmpty()) {
             return retVal;
+        }
+        
+        Month monthCopy = month.copy();
+        //Вычитаем один месяц из указанного года и месяца.
+        if(monthCopy != null && monthCopy.substractByOne())
+        {
+            year.setReturnValue(year.getReturnValue() - 1);
+            year.setDisplayValue(String.valueOf(year.getReturnValue()));
         }
 
         Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
-        String durabilityWhere = (durability != null && !durability.equals("")) ? " WHERE T_Q_ST.DURABILITY_MARK = '" + durability + "' " : "";
+        String densityWhere = " AND T_Q_ST.DENSITY_MARK = '" + density + "' ";
+        String durabilityWhere = (durability != null && !durability.equals("")) ? " AND T_Q_ST.DURABILITY_MARK = '" + durability + "' " : "";
         String partWhere = (part != null && part.getPartNum() != null) ? " AND T_Q_ST.PART_NO = '" + part.getPartNum() + "' " : "";
         String productWhere = (product != null && product.getName() != null) ? " AND T_Q_ST.PRODUCT_ID =" + product.getId() + " " : "";
-        String monthWhere = (month != null && month.getName() != null) ? " AND EXTRACT (MONTH FROM T_Q_ST.TEST_DATE) = " + month.getId() + " " : "";
-        String yearWhere = (year != null && year.getReturnValue() != 0) ? " AND EXTRACT (YEAR FROM T_Q_ST.TEST_DATE) = " + year.getReturnValue() + " " : "";
-        String densityWhere = (density != null && !density.equals("")) ? " AND T_Q_ST.DENSITY_MARK = '" + density + "' " : "";
-        String query = "SELECT AVG(DURABILITY_VARIATION) DV FROM T_Q_ST \n" + durabilityWhere + densityWhere + yearWhere + monthWhere + partWhere + productWhere;
+        String monthWhere = (monthCopy != null && monthCopy.getName() != null) ? " AND EXTRACT (MONTH FROM T_Q_ST.PART_DATE) = " + monthCopy.getId() + " " : "";
+        String yearWhere = (year != null && year.getReturnValue() != 0) ? " AND EXTRACT (YEAR FROM T_Q_ST.PART_DATE) = " + year.getReturnValue() + " " : "";
+        
+        String query = "SELECT AVG(DURABILITY_VARIATION) DV FROM T_Q_ST WHERE APPLY_RATIOS = 1 \n" + densityWhere + durabilityWhere  + yearWhere + monthWhere + partWhere + productWhere;
 
         try (ResultSet rset = stmt.executeQuery(query)) {
             if (rset.next()) {
@@ -1014,6 +1023,7 @@ public class DataContext {
      * @param year - год (обязательно).
      * @return
      * @throws SQLException 
+     * @throws java.text.ParseException 
      */
     public ArrayList<ProductPassport> getProductPassports(Month month, Year year) throws SQLException, ParseException {
         ArrayList<ProductPassport> retVal = new ArrayList<>();   //Возвращаемое значение.
@@ -1064,7 +1074,7 @@ public class DataContext {
                 pp.setActivity(rset.getString("ACTIVITY"));
                 pp.setNotes(rset.getString("NOTES"));
                 pp.setDurabilityMark(rset.getString("STRENGTH_CLASS"));
-                pp.setHymidity(rset.getFloat("HUMIDITY"));
+                pp.setHumidity(rset.getFloat("HUMIDITY"));
                 
                 retVal.add(pp);
             }
@@ -1073,6 +1083,29 @@ public class DataContext {
         return retVal;
     }
     //</editor-fold>
+    
+    public ProductPassport getProductPassportParameters(ProductPassport productPassport) throws SQLException{
+        if(connection == null)
+            return productPassport;
+        
+        Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+        String query = String.format("SELECT HEAT_CONDUCTION, FROST_RESIST, STEAM_FACTOR, SHRINKAGE, ACTIVITY "
+                + "FROM T_Q_PARAMETERS WHERE DENSITY = (SELECT DENSITY FROM T_PRODUCT WHERE ID = %d)", 
+                productPassport.getProduct().getId());
+        
+        try (ResultSet rset = stmt.executeQuery(query)) {
+            if (rset.next()) {
+                productPassport.setHeatConduction(rset.getFloat("HEAT_CONDUCTION"));
+                productPassport.setFrostResist(rset.getString("FROST_RESIST"));
+                productPassport.setSteamFactor(rset.getFloat("STEAM_FACTOR"));
+                productPassport.setShrinkage(rset.getFloat("SHRINKAGE"));
+                productPassport.setActivity(rset.getString("ACTIVITY"));
+            }
+        }
+        
+        return productPassport;
+    }
 
     //--------------------- Вспомогательные -------------------------------- //
     int currentDensity = 0;     //Хранит информацию о плотности с момента последнего запроса.

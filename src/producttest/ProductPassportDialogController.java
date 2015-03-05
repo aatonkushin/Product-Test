@@ -87,7 +87,7 @@ public class ProductPassportDialogController implements Initializable {
             datePicker.setValue(productPassport.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
             txtAvgDurability.setText(productPassport.getAvgDurability().toString());
             txtAvgDensity.setText(productPassport.getAvgDensity().toString());
-            txtHumidity.setText(productPassport.getHymidity().toString());
+            txtHumidity.setText(productPassport.getHumidity().toString());
             txtDurabilityMark.setText(productPassport.getDurabilityMark());
             txtReqDurability.setText(productPassport.getReqDurability().toString());
             txtSteamFactor.setText(productPassport.getSteamFactor().toString());
@@ -176,7 +176,13 @@ public class ProductPassportDialogController implements Initializable {
         txtHumidity.setText(String.valueOf(stat.getHumidity()));
         txtDurabilityMark.setText(stat.getDurabilityMark());
         txtReqDurability.setText(String.valueOf(stat.getReqDurability()));
+        
+        productPassport.setAvgDurability(stat.getAvgDurability());
+        productPassport.setAvgDensity(stat.getAvgDryDensity());
+        productPassport.setHumidity(stat.getHumidity());
+        productPassport.setDurabilityMark(stat.getDurabilityMark());
+        productPassport.setReqDurability(stat.getReqDurability());
+        
+        productPassport = blogic.getProductPassportParameters(productPassport);
     }
-    
-    
 }

@@ -112,6 +112,6 @@ public class Part {
         
         df.format(dateTime);
         String readableDate = df.format(dateTime);
-        return this.partNum + " (" + readableDate + ")";
+        return this.partNum + " (" + readableDate + ") "+productName;
     }
 }

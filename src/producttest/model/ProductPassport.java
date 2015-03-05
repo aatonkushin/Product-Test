@@ -25,7 +25,7 @@ public class ProductPassport {
     private Float heatConduction;       //Коэффициент теплопроводности в сухом состоянии
     private Float shrinkage;            //Усадка при высыхании
     private String activity;             //Удельная эффективная активность
-    private Float hymidity;             //Влажность
+    private Float humidity;             //Влажность
     private String notes;               //Примечание
 
     /**
@@ -211,17 +211,17 @@ public class ProductPassport {
     }
 
     /**
-     * @return the hymidity - Влажность
+     * @return the humidity - Влажность
      */
-    public Float getHymidity() {
-        return hymidity;
+    public Float getHumidity() {
+        return humidity;
     }
 
     /**
-     * @param hymidity - Влажность
+     * @param humidity - Влажность
      */
-    public void setHymidity(Float hymidity) {
-        this.hymidity = hymidity;
+    public void setHumidity(Float humidity) {
+        this.humidity = humidity;
     }
 
     /**

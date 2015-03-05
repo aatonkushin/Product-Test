@@ -670,11 +670,11 @@ public class BLogic {
                     ArrayList<Double> vars = dc.getDurabilityVariationsByDateAndProduct(getSelectedTestDate(), selectedPart.getProductId());
                     Double kt = 1.43;
 
-                    //При количестве результатов меньще 30 делаем kt=1.43
-                    //if (vars.size() >= 30) {
+                    //При количестве результатов меньше 5 * 6 = 30 делаем kt=1.43
+                    if (vars.size() >= 5) {
                         Double avgVariation = Calculation.calcDurabilityVariationByParts(vars);
                         kt = Calculation.calcReqDurabilityRatio(avgVariation);
-                    //}
+                    }
 
                     Double Rt = Calculation.calcReqDurability(kt, getDurabilityMark());
                     setReqDurability(Rt);
@@ -1298,13 +1298,13 @@ public class BLogic {
 
                     //Рассчитываем требуемую прочность
                     //ArrayList<Double> vars = dc.getDurabilityVariationsByDateAndProduct(getSelectedTestDate(), selectedPart.getProductId());
-                    //kt = 1.43;
+                    kt = 1.43;
 
-                    //При количестве результатов меньще 30 делаем kt=1.43
-                    /*if (vars.size() >= 30) {
+                    //При количестве результатов меньше 5*6 = 30 делаем kt=1.43
+                    if (vars.size() >= 5) {
                         avgVariation = Calculation.calcDurabilityVariationByParts(vars);
                         kt = Calculation.calcReqDurabilityRatio(avgVariation);
-                    }*/
+                    }
 
                     Double Rt = Calculation.calcReqDurability(kt, getDurabilityMark());
                     setReqDurability(Rt);
@@ -1668,6 +1668,20 @@ public class BLogic {
         } catch (SQLException | ParseException ex) {
             Logger.getLogger(BLogic.class.getName()).log(Level.SEVERE, null, ex);
             return null;
+        }
+    }
+    
+    public ProductPassport getProductPassportParameters(ProductPassport pp){
+        try {
+            return dc.getProductPassportParameters(pp);
+        } catch (SQLException ex) {
+            Logger.getLogger(BLogic.class.getName()).log(Level.SEVERE, null, ex);
+            pp.setHeatConduction(0.0f);
+            pp.setFrostResist("");
+            pp.setSteamFactor(0.0f);
+            pp.setShrinkage(0.0f);
+            pp.setActivity("±");
+            return pp;
         }
     }
 }

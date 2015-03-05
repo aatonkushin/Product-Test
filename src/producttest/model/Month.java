@@ -49,6 +49,29 @@ public class Month {
         this.name = name;
     }
     
+    /**
+     * Вычетает из текущего месяца 1(месяц).
+     * @return true - если перешёл 1->12, т.е. нужно изменять год.
+     * false - если новый месяц в текущем году.
+     */
+    public boolean substractByOne(){
+        if (getId() == 1) {
+            setId(12) ;
+            return true;
+        } else {
+            id--;
+            return false;
+        }
+    }
+    
+    /**
+     * Копирует месяц.
+     * @return Копия текущего месяца.
+     */
+    public Month copy(){
+        return new Month(id, name);
+    }
+    
     @Override
     public String toString(){
         if (this.name != null) {
