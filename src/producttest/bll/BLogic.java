@@ -671,10 +671,10 @@ public class BLogic {
                     Double kt = 1.43;
 
                     //При количестве результатов меньще 30 делаем kt=1.43
-                    if (vars.size() >= 30) {
+                    //if (vars.size() >= 30) {
                         Double avgVariation = Calculation.calcDurabilityVariationByParts(vars);
                         kt = Calculation.calcReqDurabilityRatio(avgVariation);
-                    }
+                    //}
 
                     Double Rt = Calculation.calcReqDurability(kt, getDurabilityMark());
                     setReqDurability(Rt);
@@ -1286,23 +1286,30 @@ public class BLogic {
                 //Рассчитываем класс по прочности B.
                 ArrayList<Double> vars;
                 try {
+                    System.out.println("-------------------------------------");
                     vars = dc.getDurabilityVariationsByDateAndProduct(getSelectedTestDate(), getSelectedPart().getProductId());
+                    System.out.println("Кол-во коэффициентов вариации: "+vars.size());
                     Double avgVariation = Calculation.calcDurabilityVariationByParts(vars);
+                    System.out.println("Средний коэф. вариации: "+avgVariation);
                     Double kt = Calculation.calcReqDurabilityRatio(avgVariation);
+                    System.out.println("kt: "+kt);
                     setDurabilityMark(Calculation.calcDurabilityMark((Double) t1, kt, results));
+                    System.out.println("Марка по прочности: "+getDurabilityMark());
 
                     //Рассчитываем требуемую прочность
                     //ArrayList<Double> vars = dc.getDurabilityVariationsByDateAndProduct(getSelectedTestDate(), selectedPart.getProductId());
-                    kt = 1.43;
+                    //kt = 1.43;
 
                     //При количестве результатов меньще 30 делаем kt=1.43
-                    if (vars.size() >= 30) {
+                    /*if (vars.size() >= 30) {
                         avgVariation = Calculation.calcDurabilityVariationByParts(vars);
                         kt = Calculation.calcReqDurabilityRatio(avgVariation);
-                    }
+                    }*/
 
                     Double Rt = Calculation.calcReqDurability(kt, getDurabilityMark());
                     setReqDurability(Rt);
+                    System.out.println("Требуемая прочность бетона Rt: " + Rt);
+                    System.out.println("-------------------------------------");
                     //---
                 } catch (SQLException | ParseException ex) {
                     Logger.getLogger(BLogic.class.getName()).log(Level.SEVERE, null, ex);

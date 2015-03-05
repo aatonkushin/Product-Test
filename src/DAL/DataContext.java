@@ -638,7 +638,7 @@ public class DataContext {
         Calendar end = new GregorianCalendar();
         end.setTime(d);
         end.add(Calendar.MONTH, -1);
-        end.set(Calendar.DAY_OF_MONTH, end.getMaximum(Calendar.DAY_OF_MONTH));
+        end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
 
         int density = this.getDensityByProductId(productId); //Плотность продукции, для которой выбираем коэффициенты вариации.
         //Затем получаем 30 результатов за последние 30 дней.
@@ -656,7 +656,7 @@ public class DataContext {
                 retVal.add(rset.getDouble(1));
             }
         }
-
+        //System.out.println("Result: " + retVal.size());
         return retVal;
     }
 

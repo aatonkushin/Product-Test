@@ -223,6 +223,7 @@ public abstract class Calculation {
      * 7. Рассчитывает класс по прочности.
      *
      * @param avgDurability - средняя прочность.
+     * @param kt
      * @param results - список результатов испытаний.
      * @return класс по прочности
      */

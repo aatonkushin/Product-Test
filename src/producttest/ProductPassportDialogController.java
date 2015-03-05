@@ -5,18 +5,13 @@
  */
 package producttest;
 
-import com.sun.media.jfxmediaimpl.MediaDisposer;
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Month;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -25,7 +20,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import javax.annotation.processing.RoundEnvironment;
 import producttest.bll.BLogic;
 import producttest.model.Part;
 import producttest.model.Product;
@@ -72,8 +66,10 @@ public class ProductPassportDialogController implements Initializable {
     @FXML
     private Button btnCancel;
     
-    BLogic blogic;
-    ProductPassport productPassport;
+    BLogic blogic;                      //
+    ProductPassport productPassport;    //
+    
+    Boolean firstChange = false;                //Флаг первого изменения в комбобоксе (нужен, что бы не перезаписывать данные полях при первой загрузке в режиме изменения)
 
     public void initData(ProductPassport productPassport, BLogic blogic){
         
@@ -86,6 +82,7 @@ public class ProductPassportDialogController implements Initializable {
         comboProduct.setItems(blogic.getProducts());
         
         if (productPassport.getId() != -1) {
+            firstChange = true;
             comboProduct.getSelectionModel().select(productPassport.getProduct());
             datePicker.setValue(productPassport.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
             txtAvgDurability.setText(productPassport.getAvgDurability().toString());
@@ -145,6 +142,11 @@ public class ProductPassportDialogController implements Initializable {
             return;
         }
         
+        if (firstChange) {
+            firstChange = false;
+            return;
+        }
+        
         //Устанавливаем тип продукции.
         for(Product product: comboProduct.getItems()){
             if (product.getId() == comboPartNum.getSelectionModel().getSelectedItem().getProductId()) {
@@ -169,7 +171,7 @@ public class ProductPassportDialogController implements Initializable {
         Stat stat = stats.get(0);
         
         //Устанавливаем полученные значения в элементы управления.
-        txtAvgDurability.setText(String.valueOf(Math.round(stat.getAvgDurability())));
+        txtAvgDurability.setText(String.valueOf(Math.round(stat.getAvgDurability())));     
         txtAvgDensity.setText(String.valueOf(Math.round(stat.getAvgDryDensity())));
         txtHumidity.setText(String.valueOf(stat.getHumidity()));
         txtDurabilityMark.setText(stat.getDurabilityMark());
