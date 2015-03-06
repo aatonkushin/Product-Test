@@ -15,7 +15,6 @@ import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -32,6 +31,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -48,6 +49,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -306,6 +309,36 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
 
         //-------------------------------------------------
         comboPartNum.setItems(blogic.getPartNumbers());
+        comboPartNum.setCellFactory(new Callback<ListView<Part>, ListCell<Part>>() {
+                       
+            @Override
+            public ListCell<Part> call(ListView<Part> param) {
+                 final ListCell<Part> cell = new ListCell<Part>() {
+                        {
+                            //super.setPrefWidth(100);
+                        }    
+                        @Override public void updateItem(Part item, 
+                            boolean empty) {
+                                super.updateItem(item, empty);
+                                if (item != null) {
+                                    setText(item.toString());
+                                    if (item.getTestId() > 0) {
+                                        this.setFont(this.getFont().font(this.getFont().getName(), FontWeight.BOLD ,this.getFont().getSize()));
+                                    }
+                                    else{
+                                        this.setFont(this.getFont().font(this.getFont().getName(), FontWeight.NORMAL ,this.getFont().getSize()));
+                                    }
+                                }
+                                else {
+                                    setText(null);
+                                }
+                            }
+                };
+                return cell;
+
+            }
+        });
+        
         comboSampleType.setItems(blogic.getSampleTypes());
         comboAdditionalMeasure1.setItems(blogic.getAdditionalMeasures());
         comboAdditionalMeasure2.setItems(blogic.getAdditionalMeasures());

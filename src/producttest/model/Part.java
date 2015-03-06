@@ -20,6 +20,7 @@ public class Part {
     private Date dateTime;
     private int productId;
     private String productName;
+    private int testId;
 
     DateFormat df;
 
@@ -113,5 +114,19 @@ public class Part {
         df.format(dateTime);
         String readableDate = df.format(dateTime);
         return this.partNum + " (" + readableDate + ") "+productName;
+    }
+
+    /**
+     * @return the testId
+     */
+    public int getTestId() {
+        return testId;
+    }
+
+    /**
+     * @param testId the testId to set
+     */
+    public void setTestId(int testId) {
+        this.testId = testId;
     }
 }

@@ -49,7 +49,7 @@
                   <Font name="System Bold" size="12.0" />
                </font>
             </Label>
-            <Label text="Предел прочности при сжатии" GridPane.rowIndex="3" />
+            <Label fx:id="lblAvgDurability" text="Предел прочности при сжатии" GridPane.rowIndex="3" />
             <Label text="Средняя плотность" GridPane.rowIndex="4" />
             <Label text="Влажность" GridPane.rowIndex="5" />
             <Label text="Класс прочности" GridPane.rowIndex="6" />

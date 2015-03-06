@@ -107,6 +107,8 @@ public class DataContext {
      * @throws java.text.ParseException
      */
     public ArrayList<Part> getParts() throws SQLException, ParseException {
+        Date start = new Date();
+        System.out.println(" getParts() Start: " + start.toString());
         ArrayList<Part> retVal = new ArrayList<>();
 
         if (connection == null) {
@@ -116,10 +118,9 @@ public class DataContext {
         Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
         String query = "SELECT DISTINCT TRUNC(DATE_TIME) DATE_TIME, PART_NO, PRODUCT_ID, NAME FROM T_Q_CUTTING, T_PRODUCT WHERE\n"
                 + "T_Q_CUTTING.PRODUCT_ID = T_PRODUCT.ID(+) ORDER BY DATE_TIME DESC, PART_NO DESC";
-
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         //System.out.println("\nExecuting query: " + query);
         try (ResultSet rset = stmt.executeQuery(query)) {
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
             int n = 0;
             while (rset.next()) {
@@ -130,6 +131,26 @@ public class DataContext {
 
             //System.out.println("\nLoaded: " + n);
         }
+/*
+        String q = "SELECT T_Q_ST.ID ID FROM T_Q_ST WHERE PART_NO = '%s' AND TO_CHAR(TRUNC(T_Q_ST.PART_DATE), 'yyyy-MM-dd') =  '%s' AND T_Q_ST.PRODUCT_ID = %d";
+        for (Part part : retVal) {
+            //Calendar cal = Calendar.getInstance();
+            //cal.setTime(part.getDateTime());
+            //cal.get(Calendar.YEAR)
+            query = String.format(q, part.getPartNum(), df.format(part.getDateTime()), part.getProductId());
+
+            try (ResultSet rset = stmt.executeQuery(query)) {
+                if (rset.next()) {
+                    part.setTestId(rset.getInt("ID"));
+                } else {
+                    part.setTestId(-1);
+                }
+            }
+        }
+        */
+
+        Date end = new Date();
+        System.out.println(" getParts() End: " + end.toString());
         return retVal;
     }
 
@@ -657,7 +678,7 @@ public class DataContext {
             }
         }
         //System.out.println("Result: " + retVal.size());
-         return retVal;
+        return retVal;
     }
 
     /**
@@ -750,11 +771,8 @@ public class DataContext {
 
         return retVal;
     }
-    
-   
 
     //<editor-fold defaultstate="collapsed" desc="Статистика испытаний ГП">
-    
     /**
      * Возвращает статистику испытаний ГП
      *
@@ -764,9 +782,10 @@ public class DataContext {
      * @throws SQLException
      * @throws ParseException
      */
-     public ArrayList<Stat> getProductTestStatistics(Part part, Year year) throws SQLException, ParseException{
+    public ArrayList<Stat> getProductTestStatistics(Part part, Year year) throws SQLException, ParseException {
         return this.getProductTestStatistics(part, null, null, year, "", "");
     }
+
     /**
      * Возвращает статистику испытаний ГП
      *
@@ -898,7 +917,8 @@ public class DataContext {
      *
      * @param part - партия
      * @param product - продукция
-     * @param month - месяц (коэффициэнт вариации расчитывается по месяцу, идущему перед этим.)
+     * @param month - месяц (коэффициэнт вариации расчитывается по месяцу,
+     * идущему перед этим.)
      * @param year - год
      * @param density - плотность
      * @param durability - прочность
@@ -911,11 +931,10 @@ public class DataContext {
         if (connection == null || density == null || density.isEmpty()) {
             return retVal;
         }
-        
+
         Month monthCopy = month.copy();
         //Вычитаем один месяц из указанного года и месяца.
-        if(monthCopy != null && monthCopy.substractByOne())
-        {
+        if (monthCopy != null && monthCopy.substractByOne()) {
             year.setReturnValue(year.getReturnValue() - 1);
             year.setDisplayValue(String.valueOf(year.getReturnValue()));
         }
@@ -928,8 +947,8 @@ public class DataContext {
         String productWhere = (product != null && product.getName() != null) ? " AND T_Q_ST.PRODUCT_ID =" + product.getId() + " " : "";
         String monthWhere = (monthCopy != null && monthCopy.getName() != null) ? " AND EXTRACT (MONTH FROM T_Q_ST.PART_DATE) = " + monthCopy.getId() + " " : "";
         String yearWhere = (year != null && year.getReturnValue() != 0) ? " AND EXTRACT (YEAR FROM T_Q_ST.PART_DATE) = " + year.getReturnValue() + " " : "";
-        
-        String query = "SELECT AVG(DURABILITY_VARIATION) DV FROM T_Q_ST WHERE APPLY_RATIOS = 1 \n" + densityWhere + durabilityWhere  + yearWhere + monthWhere + partWhere + productWhere;
+
+        String query = "SELECT AVG(DURABILITY_VARIATION) DV FROM T_Q_ST WHERE APPLY_RATIOS = 1 \n" + densityWhere + durabilityWhere + yearWhere + monthWhere + partWhere + productWhere;
 
         try (ResultSet rset = stmt.executeQuery(query)) {
             if (rset.next()) {
@@ -1019,11 +1038,12 @@ public class DataContext {
     //<editor-fold defaultstate="collapsed" desc="Реестр паспортов ГП">
     /**
      * Возвращает список пасспортов по указанным критериям.
+     *
      * @param month - месяц (не обязательно)
      * @param year - год (обязательно).
      * @return
-     * @throws SQLException 
-     * @throws java.text.ParseException 
+     * @throws SQLException
+     * @throws java.text.ParseException
      */
     public ArrayList<ProductPassport> getProductPassports(Month month, Year year) throws SQLException, ParseException {
         ArrayList<ProductPassport> retVal = new ArrayList<>();   //Возвращаемое значение.
@@ -1052,18 +1072,18 @@ public class DataContext {
                 ProductPassport pp = new ProductPassport();
                 pp.setId(rset.getInt("ID"));
                 pp.setPartNum(rset.getString("PART_NO"));
-                
+
                 DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
                 Date d = df.parse(rset.getString("DAY"));
                 pp.setDate(d);
-                
-                for(Product p : getProducts()){
+
+                for (Product p : getProducts()) {
                     if (p.getId() == rset.getInt("PRODUCT_ID")) {
                         pp.setProduct(p);
                         break;
                     }
                 }
-                
+
                 pp.setAvgDurability(rset.getFloat("COMPRESS_STRENGTH"));
                 pp.setReqDurability(rset.getFloat("REQ_STRENGTH"));
                 pp.setAvgDensity(rset.getFloat("AVG_DENSITY"));
@@ -1075,7 +1095,7 @@ public class DataContext {
                 pp.setNotes(rset.getString("NOTES"));
                 pp.setDurabilityMark(rset.getString("STRENGTH_CLASS"));
                 pp.setHumidity(rset.getFloat("HUMIDITY"));
-                
+
                 retVal.add(pp);
             }
         }
@@ -1083,17 +1103,18 @@ public class DataContext {
         return retVal;
     }
     //</editor-fold>
-    
-    public ProductPassport getProductPassportParameters(ProductPassport productPassport) throws SQLException{
-        if(connection == null)
+
+    public ProductPassport getProductPassportParameters(ProductPassport productPassport) throws SQLException {
+        if (connection == null) {
             return productPassport;
-        
+        }
+
         Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
         String query = String.format("SELECT HEAT_CONDUCTION, FROST_RESIST, STEAM_FACTOR, SHRINKAGE, ACTIVITY "
-                + "FROM T_Q_PARAMETERS WHERE DENSITY = (SELECT DENSITY FROM T_PRODUCT WHERE ID = %d)", 
+                + "FROM T_Q_PARAMETERS WHERE DENSITY = (SELECT DENSITY FROM T_PRODUCT WHERE ID = %d)",
                 productPassport.getProduct().getId());
-        
+
         try (ResultSet rset = stmt.executeQuery(query)) {
             if (rset.next()) {
                 productPassport.setHeatConduction(rset.getFloat("HEAT_CONDUCTION"));
@@ -1103,7 +1124,7 @@ public class DataContext {
                 productPassport.setActivity(rset.getString("ACTIVITY"));
             }
         }
-        
+
         return productPassport;
     }
 
