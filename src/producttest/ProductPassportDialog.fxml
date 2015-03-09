@@ -34,35 +34,35 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label text="Дата выпуска" GridPane.rowIndex="1">
+            <Label fx:id="lblDate" text="Дата выпуска" GridPane.rowIndex="1">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
             </Label>
-            <Label text="Номер партии">
+            <Label fx:id="lblPartNum" text="Номер партии">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
             </Label>
-            <Label text="Вид продукции" GridPane.rowIndex="2">
+            <Label fx:id="lblProduct" text="Вид продукции" GridPane.rowIndex="2">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
             </Label>
             <Label fx:id="lblAvgDurability" text="Предел прочности при сжатии" GridPane.rowIndex="3" />
-            <Label text="Средняя плотность" GridPane.rowIndex="4" />
-            <Label text="Влажность" GridPane.rowIndex="5" />
-            <Label text="Класс прочности" GridPane.rowIndex="6" />
-            <Label text="Требуемая прочность" GridPane.rowIndex="7" />
-            <Label text="Коэффициент паропроницаемости" GridPane.rowIndex="8" />
-            <Label text="Марка по морозостойкости" GridPane.rowIndex="9" />
-            <Label text="Коэффициент теплопроводности &#10;в сухом состоянии" GridPane.rowIndex="10" />
-            <Label text="Усадка при высыхании" GridPane.rowIndex="11" />
-            <Label text="Удельная эффективная&#10;активность ЕРН" GridPane.rowIndex="12" />
+            <Label fx:id="lblAvgDensity" text="Средняя плотность" GridPane.rowIndex="4" />
+            <Label fx:id="lblHumidity" text="Влажность" GridPane.rowIndex="5" />
+            <Label fx:id="lblDurabilityMark" text="Класс прочности" GridPane.rowIndex="6" />
+            <Label fx:id="lblReqDurability" text="Требуемая прочность" GridPane.rowIndex="7" />
+            <Label fx:id="lblSteamFactor" text="Коэффициент паропроницаемости" GridPane.rowIndex="8" />
+            <Label fx:id="lblFrostresist" text="Марка по морозостойкости" GridPane.rowIndex="9" />
+            <Label fx:id="lblHeatConduction" text="Коэффициент теплопроводности &#10;в сухом состоянии" GridPane.rowIndex="10" />
+            <Label fx:id="lblShrinkage" text="Усадка при высыхании" GridPane.rowIndex="11" />
+            <Label fx:id="lblActivity" text="Удельная эффективная&#10;активность ЕРН" GridPane.rowIndex="12" />
             <Label text="Примечание" GridPane.rowIndex="13" />
             <ComboBox fx:id="comboPartNum" onAction="#comboPartNumOnChange" prefWidth="188.0" GridPane.columnIndex="1" />
-            <ComboBox fx:id="comboProduct" prefWidth="188.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <DatePicker fx:id="datePicker" prefWidth="188.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <ComboBox fx:id="comboProduct" prefWidth="188.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <TextField fx:id="txtAvgDurability" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <TextField fx:id="txtAvgDensity" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="4" />
             <TextField fx:id="txtHumidity" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="5" />
@@ -71,7 +71,6 @@
             <TextField fx:id="txtSteamFactor" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="8" />
             <TextField fx:id="txtFrostresist" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="9" />
             <TextField fx:id="txtHeatConduction" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="10" />
-            <TextField GridPane.columnIndex="1" GridPane.rowIndex="11" />
             <TextField fx:id="txtShrinkage" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="11" />
             <TextField fx:id="txtActivity" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="12" />
             <TextField fx:id="txtNotes" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="13" />

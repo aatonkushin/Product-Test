@@ -7,11 +7,13 @@ package producttest;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,7 +28,11 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
@@ -310,35 +316,35 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         //-------------------------------------------------
         comboPartNum.setItems(blogic.getPartNumbers());
         comboPartNum.setCellFactory(new Callback<ListView<Part>, ListCell<Part>>() {
-                       
+
             @Override
             public ListCell<Part> call(ListView<Part> param) {
-                 final ListCell<Part> cell = new ListCell<Part>() {
-                        {
-                            //super.setPrefWidth(100);
-                        }    
-                        @Override public void updateItem(Part item, 
+                final ListCell<Part> cell = new ListCell<Part>() {
+                    {
+                        //super.setPrefWidth(100);
+                    }
+
+                    @Override
+                    public void updateItem(Part item,
                             boolean empty) {
-                                super.updateItem(item, empty);
-                                if (item != null) {
-                                    setText(item.toString());
-                                    if (item.getTestId() > 0) {
-                                        this.setFont(this.getFont().font(this.getFont().getName(), FontWeight.BOLD ,this.getFont().getSize()));
-                                    }
-                                    else{
-                                        this.setFont(this.getFont().font(this.getFont().getName(), FontWeight.NORMAL ,this.getFont().getSize()));
-                                    }
-                                }
-                                else {
-                                    setText(null);
-                                }
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.toString());
+                            if (item.getTestId() > 0) {
+                                this.setFont(this.getFont().font(this.getFont().getName(), FontWeight.BOLD, this.getFont().getSize()));
+                            } else {
+                                this.setFont(this.getFont().font(this.getFont().getName(), FontWeight.NORMAL, this.getFont().getSize()));
                             }
+                        } else {
+                            setText(null);
+                        }
+                    }
                 };
                 return cell;
 
             }
         });
-        
+
         comboSampleType.setItems(blogic.getSampleTypes());
         comboAdditionalMeasure1.setItems(blogic.getAdditionalMeasures());
         comboAdditionalMeasure2.setItems(blogic.getAdditionalMeasures());
@@ -1047,6 +1053,36 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         if (event.getClickCount() == 2) {
             if (tblPassports.getSelectionModel().getSelectedItem() != null) {
                 OpenPassportDialog(tblPassports.getSelectionModel().getSelectedItem());
+            }
+        }
+    }
+
+    @FXML
+    private void btnDeletePassOnClick(ActionEvent event) {
+        if (tblPassports.getSelectionModel().getSelectedItem() != null) {
+            try {
+                Alert alert = new Alert(AlertType.CONFIRMATION);
+                alert.setTitle("Удаление паспорта ГП");
+                alert.setHeaderText(null);
+                alert.setContentText("Удалить выбранный паспорт?");
+
+                ButtonType btnTypeOk = new ButtonType("ОК", ButtonBar.ButtonData.OK_DONE);
+                ButtonType btnTypeCancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                alert.getButtonTypes().setAll(btnTypeOk, btnTypeCancel);
+
+                // Добавляем иконку.
+                Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+                stage.getIcons().add(new Image(this.getClass().getResource("logo.png").toString()));
+
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == btnTypeOk) {
+                    //Пользователь нажал на ОК.
+                    blogic.deleteProductPassport(tblPassports.getSelectionModel().getSelectedItem());
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
     }

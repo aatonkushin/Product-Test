@@ -131,23 +131,23 @@ public class DataContext {
 
             //System.out.println("\nLoaded: " + n);
         }
-/*
-        String q = "SELECT T_Q_ST.ID ID FROM T_Q_ST WHERE PART_NO = '%s' AND TO_CHAR(TRUNC(T_Q_ST.PART_DATE), 'yyyy-MM-dd') =  '%s' AND T_Q_ST.PRODUCT_ID = %d";
-        for (Part part : retVal) {
-            //Calendar cal = Calendar.getInstance();
-            //cal.setTime(part.getDateTime());
-            //cal.get(Calendar.YEAR)
-            query = String.format(q, part.getPartNum(), df.format(part.getDateTime()), part.getProductId());
+        /*
+         String q = "SELECT T_Q_ST.ID ID FROM T_Q_ST WHERE PART_NO = '%s' AND TO_CHAR(TRUNC(T_Q_ST.PART_DATE), 'yyyy-MM-dd') =  '%s' AND T_Q_ST.PRODUCT_ID = %d";
+         for (Part part : retVal) {
+         //Calendar cal = Calendar.getInstance();
+         //cal.setTime(part.getDateTime());
+         //cal.get(Calendar.YEAR)
+         query = String.format(q, part.getPartNum(), df.format(part.getDateTime()), part.getProductId());
 
-            try (ResultSet rset = stmt.executeQuery(query)) {
-                if (rset.next()) {
-                    part.setTestId(rset.getInt("ID"));
-                } else {
-                    part.setTestId(-1);
-                }
-            }
-        }
-        */
+         try (ResultSet rset = stmt.executeQuery(query)) {
+         if (rset.next()) {
+         part.setTestId(rset.getInt("ID"));
+         } else {
+         part.setTestId(-1);
+         }
+         }
+         }
+         */
 
         Date end = new Date();
         System.out.println(" getParts() End: " + end.toString());
@@ -520,6 +520,8 @@ public class DataContext {
                 ht.setDryWeight(rset.getDouble(6));
                 retVal.add(ht);
             }
+            
+            rset.close();
         }
 
         return retVal;
@@ -560,6 +562,7 @@ public class DataContext {
 
                 retVal.add(st);
             }
+            rset.close();
         }
 
         return retVal;
@@ -622,6 +625,7 @@ public class DataContext {
             while (rset.next()) {
                 retVal.add(rset.getDouble(1));
             }
+            rset.close();
         }
 
         return retVal;
@@ -676,6 +680,7 @@ public class DataContext {
             while (rset.next()) {
                 retVal.add(rset.getDouble(1));
             }
+            rset.close();
         }
         //System.out.println("Result: " + retVal.size());
         return retVal;
@@ -713,6 +718,7 @@ public class DataContext {
                 p.setDensity(rset.getInt("density"));
                 products.add(p);
             }
+            rset.close();
         }
 
         return products;
@@ -740,6 +746,7 @@ public class DataContext {
             while (rset.next()) {
                 retVal.add(rset.getString("DM"));
             }
+            rset.close();
         }
 
         return retVal;
@@ -1098,12 +1105,20 @@ public class DataContext {
 
                 retVal.add(pp);
             }
+            rset.close();
         }
-
+        
         return retVal;
     }
-    //</editor-fold>
 
+    /**
+     * Возвращает редко-изменяемые параметры паспорта ГП. Сразу не загружаем для
+     * экономии времени первоначальной загрузки.
+     *
+     * @param productPassport
+     * @return
+     * @throws SQLException
+     */
     public ProductPassport getProductPassportParameters(ProductPassport productPassport) throws SQLException {
         if (connection == null) {
             return productPassport;
@@ -1127,6 +1142,86 @@ public class DataContext {
 
         return productPassport;
     }
+
+    /**
+     * Создаёт или обновляет паспорт готовой продукции в БД. Если id = 0, то создаёт, иначе пытается обновить запись с указанным id.
+     * @param pp - паспорт ГП.
+     * @return id вставленной или обновлённой записи.
+     * @throws SQLException
+     */
+    public int createOrUpdateProductPassport(ProductPassport pp) throws SQLException {
+        if (connection == null) {
+            return -1;
+        }
+
+        //Проверяем: есть ли уже такой паспорт.
+        if (pp.getId() == -1) {
+            //Вставка записи.
+            String format = "INSERT INTO T_Q_PASS (PART_NO, DAY, PRODUCT_ID, COMPRESS_STRENGTH, REQ_STRENGTH, AVG_DENSITY, STEAM_FACTOR, FROST_RESIST,\n"
+                    + " HEAT_CONDUCTION, SHRINKAGE, ACTIVITY, NOTES, STRENGTH_CLASS, HUMIDITY)\n"
+                    + " VALUES ('%s', TO_DATE('%s', 'DD.MM.YYYY'), %d, %f, %f, %f, %f, '%s', %f, %f, '%s', '%s', '%s', %f)";
+            
+            DateFormat df = new SimpleDateFormat("dd.MM.YYYY");
+            String query = String.format(format, pp.getPartNum(), df.format(pp.getDate()), 
+                    pp.getProduct().getId(), pp.getAvgDurability(), pp.getReqDurability(), 
+                    pp.getAvgDensity(), pp.getSteamFactor(), pp.getFrostResist(), 
+                    pp.getHeatConduction(), pp.getShrinkage(), pp.getActivity(), pp.getNotes(), pp.getDurabilityMark(), pp.getHumidity());
+            
+            Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            
+            stmt.executeUpdate(query);
+            
+            //Получаем ID вставленной записи, на всякий случай проверяем код продукта.
+            query = "SELECT MAX(ID) MID FROM T_Q_PASS WHERE PRODUCT_ID = " + pp.getProduct().getId();
+            int id = -1;
+            try (ResultSet rset = stmt.executeQuery(query)) {
+                if (rset.next()) {
+                    id = rset.getInt("MID");
+                }
+                
+                rset.close();
+                return id;
+            }
+                    
+        } else {
+            //Обновление записи.
+            String format = "UPDATE T_Q_PASS SET PART_NO = '%s', DAY = TO_DATE('%s', 'DD.MM.YYYY'), PRODUCT_ID = %d,"
+                    + " COMPRESS_STRENGTH = %f, REQ_STRENGTH = %f, AVG_DENSITY = %f, STEAM_FACTOR = %f, FROST_RESIST = '%s',\n"
+                    + " HEAT_CONDUCTION = %f, SHRINKAGE = %f, ACTIVITY = '%s', NOTES = '%s', STRENGTH_CLASS = '%s', HUMIDITY = %f"
+                    + " WHERE ID = %d";
+            
+            DateFormat df = new SimpleDateFormat("dd.MM.YYYY");
+            
+            String query = String.format(format, pp.getPartNum(), df.format(pp.getDate()), 
+                    pp.getProduct().getId(), pp.getAvgDurability(), pp.getReqDurability(), 
+                    pp.getAvgDensity(), pp.getSteamFactor(), pp.getFrostResist(), 
+                    pp.getHeatConduction(), pp.getShrinkage(), pp.getActivity(), pp.getNotes(), pp.getDurabilityMark(), pp.getHumidity(), pp.getId());
+            
+            Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            
+            stmt.execute(query);
+            
+            return pp.getId();
+        }
+    }
+
+    /**
+     * Удаляет паспорт продукции из БД.
+     * @param productPassport - паспорт ГП.
+     * @throws java.sql.SQLException
+     */
+    public void deleteProductPassport(ProductPassport productPassport) throws SQLException {
+        if (connection == null) {
+            return;
+        }
+        
+        String query = "DELETE FROM T_Q_PASS WHERE ID="+productPassport.getId();
+        
+        Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        
+        stmt.executeUpdate(query);
+    }
+    //</editor-fold>
 
     //--------------------- Вспомогательные -------------------------------- //
     int currentDensity = 0;     //Хранит информацию о плотности с момента последнего запроса.

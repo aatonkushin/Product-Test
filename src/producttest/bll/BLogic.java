@@ -1684,4 +1684,39 @@ public class BLogic {
             return pp;
         }
     }
+    
+    /**
+     * Дабавляет или изменяет указанную запись в базе данных.
+     * @param pp - паспорт качества ГП
+     * @return id добавленной или изменённой записи.
+     * @throws SQLException 
+     */
+    public int createOrUpdateProductPassport(ProductPassport pp) throws SQLException{
+        //Вставляем запись в БД.
+        int id = dc.createOrUpdateProductPassport(pp);
+        
+        //Если новая запись, то просто её добавляем в ObservableList
+        if (id != pp.getId() && id != -1) {
+            pp.setId(id);
+            //productPassports.add(pp);
+            productPassports.add(0, pp);
+        } else {
+            //если было обновление, то перезагружаем весь список.
+            updateProductPassports();
+        }
+        
+        return id;
+    }
+    
+    /**
+     * Удаляет указанную запись из БД.
+     * @param pp - паспорт качества ГП
+     * @throws SQLException 
+     */
+    public void deleteProductPassport(ProductPassport pp) throws SQLException{
+        dc.deleteProductPassport(pp);
+        
+        //перезагружаем весь список.
+        updateProductPassports();
+    }
 }
