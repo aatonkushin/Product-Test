@@ -463,7 +463,7 @@
                                     <Button fx:id="btnAddPass" mnemonicParsing="false" onAction="#btnAddPassOnAction" prefHeight="25.0" prefWidth="80.0" text="Добавить" />
                                     <Button fx:id="btnChangePass" mnemonicParsing="false" onAction="#btnChangePassOnAction" prefHeight="25.0" prefWidth="80.0" text="Изменить" />
                                     <Button fx:id="btnDeletePass" mnemonicParsing="false" onAction="#btnDeletePassOnClick" prefHeight="25.0" prefWidth="80.0" text="Удалить" />
-                                    <Button fx:id="btnPrintPass" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="Печать">
+                                    <Button fx:id="btnPrintPass" mnemonicParsing="false" onAction="#btnPrintPassOnClick" prefHeight="25.0" prefWidth="80.0" text="Печать">
                                        <HBox.margin>
                                           <Insets left="10.0" />
                                        </HBox.margin>

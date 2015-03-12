@@ -12,6 +12,7 @@
             </fx:resources>
             <fx:info title="${application.title}" vendor="${application.vendor}">
             </fx:info>
-        </fx:deploy>          
+        </fx:deploy>
+        <fx:platform basedir="${java.home}"/>          
     </target>
 </project>

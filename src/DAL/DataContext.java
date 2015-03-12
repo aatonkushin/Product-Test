@@ -101,7 +101,7 @@ public class DataContext {
 
     /**
      * Получает номер партий из БД
-     *
+     * Использует свойство partNumsLoad из настроек (По-умолачнию: 500).
      * @return Список номеров партий.
      * @throws SQLException
      * @throws java.text.ParseException
@@ -116,8 +116,8 @@ public class DataContext {
         }
 
         Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-        String query = "SELECT DISTINCT TRUNC(DATE_TIME) DATE_TIME, PART_NO, PRODUCT_ID, NAME FROM T_Q_CUTTING, T_PRODUCT WHERE\n"
-                + "T_Q_CUTTING.PRODUCT_ID = T_PRODUCT.ID(+) ORDER BY DATE_TIME DESC, PART_NO DESC";
+        String query = "SELECT * FROM (SELECT DISTINCT TRUNC(DATE_TIME) DATE_TIME, PART_NO, PRODUCT_ID, NAME FROM T_Q_CUTTING, T_PRODUCT WHERE\n"
+                + "T_Q_CUTTING.PRODUCT_ID = T_PRODUCT.ID(+) ORDER BY DATE_TIME DESC, PART_NO DESC) WHERE ROWNUM < " + cfg.getPartNumsToLoad().toString();
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         //System.out.println("\nExecuting query: " + query);
         try (ResultSet rset = stmt.executeQuery(query)) {
@@ -707,7 +707,7 @@ public class DataContext {
 
         Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
-        String query = "SELECT id, name, density FROM T_PRODUCT order by name";
+        String query = "SELECT id, name, density, length, width, height FROM T_PRODUCT order by name";
 
         //System.out.println("\nExecuting query: " + query);
         try (ResultSet rset = stmt.executeQuery(query)) {
@@ -716,6 +716,9 @@ public class DataContext {
                 p.setId(rset.getInt("id"));
                 p.setName(rset.getString("name"));
                 p.setDensity(rset.getInt("density"));
+                p.setLength(rset.getInt("length"));
+                p.setWidth(rset.getInt("width"));
+                p.setHeight(rset.getInt("height"));
                 products.add(p);
             }
             rset.close();

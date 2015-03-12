@@ -55,7 +55,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -1084,6 +1083,34 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    @FXML
+    private void btnPrintPassOnClick(ActionEvent event) {
+        ProductPassport pp = tblPassports.getSelectionModel().getSelectedItem();
+        if (pp == null || pp.getPartNum() == null || pp.getPartNum().isEmpty()) {
+            return;
+        }
+        
+        FXMLLoader root;
+        try {
+            root = new FXMLLoader(getClass().getResource("ProductPassportPrintDialog.fxml"));
+            Stage stage = new Stage();
+            stage.setTitle("Печать паспорта ГП");
+            stage.setResizable(false);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            Image img = new Image(getClass().getResourceAsStream("logo.png"));
+            stage.getIcons().add(img);
+            stage.setScene(new Scene((Pane) root.load()));
+
+            ProductPassportPrintDialogController ppdc = root.<ProductPassportPrintDialogController>getController();
+            ppdc.initData(pp);
+
+            stage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

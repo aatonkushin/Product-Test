@@ -11,16 +11,17 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
+import javafx.util.converter.NumberStringConverter;
 
 /**
  * FXML Controller class
@@ -47,6 +48,24 @@ public class SettingsDialogController implements Initializable {
     private Label lblStatus;
     @FXML
     private TextField txtFilterPersonal;
+    @FXML
+    private TextField txtHeaderLine1;
+    @FXML
+    private TextField txtHeaderLine2;
+    @FXML
+    private TextField txtHeaderLine3;
+    @FXML
+    private TextField txtHeaderLine4;
+    @FXML
+    private TextField txtHeaderProductName;
+    @FXML
+    private TextField txtHeaderPathToLogo;
+    @FXML
+    private TextField txtFooterProfession;
+    @FXML
+    private TextField txtFooterPersonName;
+    @FXML
+    private TextField txtPartNumsToLoad;
 
 
     /**
@@ -66,6 +85,19 @@ public class SettingsDialogController implements Initializable {
         txtUsername.setText(cfg.getUsername());
         txtPassword.setText(cfg.getPassword());
         txtFilterPersonal.setText(cfg.getFilterPersonal());
+        
+        txtHeaderLine1.textProperty().bindBidirectional(cfg.getHeaderLine1Property());
+        txtHeaderLine2.textProperty().bindBidirectional(cfg.getHeaderLine2Property());
+        txtHeaderLine3.textProperty().bindBidirectional(cfg.getHeaderLine3Property());
+        txtHeaderLine4.textProperty().bindBidirectional(cfg.getHeaderLine4Property());
+        
+        txtHeaderPathToLogo.textProperty().bindBidirectional(cfg.getHeaderPathToLogoProperty());
+        txtHeaderProductName.textProperty().bindBidirectional(cfg.getHeaderProductNameProperty());
+        
+        txtFooterProfession.textProperty().bindBidirectional(cfg.getFooterProfessionProperty());
+        txtFooterPersonName.textProperty().bindBidirectional(cfg.getFooterPersonNameProperty());
+        
+        txtPartNumsToLoad.textProperty().bindBidirectional(cfg.partNumsToLoad, new NumberStringConverter());
     }
 
     @FXML
