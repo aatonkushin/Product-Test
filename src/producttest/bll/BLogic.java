@@ -43,6 +43,7 @@ import producttest.model.SampleType;
 import producttest.model.TestReport;
 import producttest.model.Product;
 import producttest.model.ProductPassport;
+import producttest.model.ProductReportRecord;
 import producttest.model.RequiredDensity;
 import producttest.model.RequiredDurability;
 import producttest.model.Stat;
@@ -55,22 +56,33 @@ import producttest.model.Year;
 public class BLogic {
 
     //<editor-fold defaultstate="collapsed" desc="Поля, геттеры, сеттеры">
-    private ObservableList<Part> partNumbers; //Номера партий.
-    private ObservableList<SampleType> sampleTypes; //Типы образцов
-    private ObservableList<SampleTest> sampleTests; //Испытания (для таблицы Испытание образцов)
-    private ObservableList<HumidityTest> humidityTests; //Испытания на влажность (для таблицы оценка влажности).
-    private ObservableList<Result> results; //Результаты испытаний.
-    private ObservableList<Person> personal; //Список сотрудников-лаборантов.
-    private ObservableList<String> positions; //Позиции испытуемых образцов в массиве.
-    private ObservableList<Product> products; //Продукция.
-    private ObservableList<Month> months;    //Месяцы в году.
-    private ObservableList<Year> years;    //Годы.
-    private ObservableList<String> densityMarks; //Марки по плотности.
-    private ObservableList<String> durabilityMarks; //Марки по прочности.
-    private ObservableList<Stat> productTestStatistics; //Статистика испытаний ГП.
-    private ObservableList<RequiredDensity> requiredDensities;  //Требуемые плотности.
-    private ObservableList<RequiredDurability> requiredDurabilities; //Требуемые прочности.
-    private ObservableList<ProductPassport> productPassports;       //Паспорта продукции.
+    private ObservableList<Part> partNumbers;                           //Номера партий.
+    private ObservableList<SampleType> sampleTypes;                     //Типы образцов
+    private ObservableList<SampleTest> sampleTests;                     //Испытания (для таблицы Испытание образцов)
+    private ObservableList<HumidityTest> humidityTests;                 //Испытания на влажность (для таблицы оценка влажности).
+    private ObservableList<Result> results;                             //Результаты испытаний.
+    private ObservableList<Person> personal;                            //Список сотрудников-лаборантов.
+    private ObservableList<String> positions;                           //Позиции испытуемых образцов в массиве.
+    private ObservableList<Product> products;                           //Продукция.
+    private ObservableList<Month> months;                               //Месяцы в году.
+    private ObservableList<Year> years;                                 //Годы.
+    private ObservableList<String> densityMarks;                        //Марки по плотности.
+    private ObservableList<String> durabilityMarks;                     //Марки по прочности.
+    private ObservableList<Stat> productTestStatistics;                 //Статистика испытаний ГП.
+    private ObservableList<RequiredDensity> requiredDensities;          //Требуемые плотности.
+    private ObservableList<RequiredDurability> requiredDurabilities;    //Требуемые прочности.
+    private ObservableList<ProductPassport> productPassports;           //Паспорта продукции.
+    
+    private ObservableList<ProductReportRecord> productsReport;          //Отчёт по готовой продукции.
+    
+    //Отчёт по готовой продукции.
+    public ObservableList<ProductReportRecord> getProductsReport(){
+        return this.productsReport;
+    }
+    
+    public void setProductsReport(ObservableList<ProductReportRecord> pr){
+        this.productsReport = pr;
+    }
 
     //Количество записей в таблице Статистики ГП во вкладке со статистикой испытаний ГП.
     private IntegerProperty tblPassportsItemsCount;
@@ -988,6 +1000,7 @@ public class BLogic {
     }
 
 //</editor-fold>
+    
     public BLogic() {
         this.additionalMeasures = FXCollections.observableArrayList("Прочность на изгиб", "Теплопроводность", "Морозостойкость", "Усадка");
         this.positions = FXCollections.observableArrayList("к. верх", "к. середина", "к. низ", "с. верх", "с. середина", "с. низ");
@@ -1433,6 +1446,22 @@ public class BLogic {
         } catch (SQLException ex) {
             System.err.println(ex);
         }
+    }
+    
+    /**
+     * Обновляет таблицу Отчёт по ГП.
+     * @throws SQLException
+     * @throws ParseException 
+     */
+    public void updateProductsReport() throws SQLException, ParseException{
+        if (productsReport == null) {
+            productsReport = FXCollections.observableArrayList();
+            //TODO: productsReportItemsCount = new SimpleIntegerProperty();
+        }
+        
+        productsReport.clear();
+        productsReport.addAll(dc.getProductsReport());
+        //TODO: setProductsReportItemsCount
     }
 
     /**

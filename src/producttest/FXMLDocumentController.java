@@ -26,6 +26,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -53,6 +54,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.FontWeight;
@@ -65,6 +67,7 @@ import javafx.util.converter.IntegerStringConverter;
 import javafx.util.converter.NumberStringConverter;
 import producttest.bll.BLogic;
 import producttest.bll.IValueChanged;
+import producttest.helpers.ErrorDialog;
 import producttest.helpers.FloatPassCallback;
 import producttest.helpers.FloatStatCallback;
 import producttest.helpers.FloatStatWORoundCallback;
@@ -306,6 +309,8 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
     private TableColumn<ProductPassport, String> colNotesPass;
     @FXML
     private Label tblPassportsItemsCount;
+    @FXML
+    private Tab tabProductReport;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -1111,6 +1116,25 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void tabProductReportOnSelectionChanged(Event event) {
+        if (tabProductReport.isSelected()) {
+            try {
+                blogic.updateProductsReport();
+                System.out.println("Кол-во записей в Отчёте по ГП: "+blogic.getProductsReport().size());
+                
+                AnchorPane ap = (AnchorPane)tabProductReport.getContent();
+                for(Node n : ap.getChildren()){
+                    ((ProductReportControl)n).init(blogic);
+                    break;
+                }
+            } catch (SQLException | ParseException ex) {
+                ErrorDialog dialog = new ErrorDialog(AlertType.ERROR, "Ошибка загрузки данных в таблицу ", ex);
+                dialog.showAndWait();
+            }
         }
     }
 
