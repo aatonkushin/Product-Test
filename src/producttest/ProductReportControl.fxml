@@ -18,15 +18,15 @@
             </Label>
             <ComboBox fx:id="comboReportType" onAction="#comboReportTypeOnAction" prefWidth="150.0" />
             <Label text="с" />
-            <DatePicker fx:id="txtDateFrom" />
+            <DatePicker fx:id="dateFrom" onAction="#dateFromOnChanged" />
             <Label text="по" />
-            <DatePicker fx:id="txtDateTo" />
+            <DatePicker fx:id="dateTo" onAction="#dateToOnChanged" />
          </children>
          <VBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </VBox.margin>
       </HBox>
-      <TableView fx:id="tblProductReport">
+      <TableView fx:id="tblProductReport" prefHeight="650.0">
         <columns>
           <TableColumn fx:id="colPartNum" prefWidth="75.0" text="    №&#10;партии" />
           <TableColumn fx:id="colDate" prefWidth="75.0" text="Дата" />
@@ -50,6 +50,11 @@
                   <TableColumn fx:id="colDensityMark" prefWidth="75.0" text="Марка&#10;по плотности" />
                   <TableColumn fx:id="colAvgDurability" prefWidth="75.0" text="Предел прочности&#10;при сжатии,&#10;кг/см3" />
                   <TableColumn fx:id="colDurabilityMark" prefWidth="75.0" text="Класс&#10;по прочности" />
+                  <TableColumn fx:id="colFrostresist" prefWidth="75.0" text="Морозостойкость" />
+                  <TableColumn fx:id="colActivity" prefWidth="75.0" text="Удельная активность&#10;&#9;ЕРН,&#9;Бк/кг" />
+                  <TableColumn fx:id="colHeatconduction" prefWidth="75.0" text="Теплопроводность,&#10;&#9;  Вт/мoC" />
+                  <TableColumn fx:id="colSteamfactor" prefWidth="75.0" text="Паропроницаемость,&#10;&#9;   мг/м ч Па" />
+                  <TableColumn fx:id="colShrinkage" prefWidth="75.0" text="Усадка при высыхании,&#10;&#9;&#9;мм/м" />
                </columns>
             </TableColumn>
         </columns>
@@ -57,5 +62,22 @@
             <Insets left="12.0" />
          </VBox.margin>
       </TableView>
+      <HBox>
+         <children>
+            <Label text="Всего записей:">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
+            <Label fx:id="lblItemsCount" text="Label">
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+         <VBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </VBox.margin>
+      </HBox>
    </children>
 </fx:root>

@@ -8,10 +8,12 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import java.net.*?>
+<?import producttest.*?>
+<?scenebuilder-classpath-element C:/Users/tonkushin/Documents/NetBeansProjects/ProductTest/distProductTest.jar ?>
 
 <AnchorPane id="AnchorPane" prefWidth="980.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="producttest.FXMLDocumentController">
     <children>
-      <TabPane fx:id="tabPane" prefHeight="689.0" prefWidth="975.0" side="LEFT" tabClosingPolicy="UNAVAILABLE">
+      <TabPane fx:id="tabPane" prefHeight="689.0" prefWidth="975.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
           <Tab fx:id="tabProductTest" text="Испытания ГП">
             <content>
@@ -509,7 +511,7 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0">
                    <children>
-                    <producttest.ProductReportControl AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
+                    <ProductReportControl AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
                    </children>    
                 </AnchorPane>
               </content>

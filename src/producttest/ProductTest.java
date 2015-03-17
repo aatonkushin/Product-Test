@@ -24,12 +24,11 @@ public class ProductTest extends Application {
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("FXMLDocument.fxml"));
         Scene scene = new Scene(root);
-        //Image img = new Image("file:logo.png");
         Image img = new Image(getClass().getResourceAsStream("logo.png"));
         stage.getIcons().add(img);
         stage.setTitle("Протокол испытаний");
         stage.setScene(scene);
-        stage.setResizable(false);
+        stage.setResizable(true);
 
         stage.show();
     }

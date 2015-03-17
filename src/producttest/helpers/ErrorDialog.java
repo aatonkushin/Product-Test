@@ -36,7 +36,7 @@ public class ErrorDialog extends Alert {
 
             // Добавляем иконку.
             Stage stage = (Stage) this.getDialogPane().getScene().getWindow();
-            stage.getIcons().add(new Image(this.getClass().getResource("logo.png").toString()));
+            //stage.getIcons().add(new Image(this.getClass().getResource("logo.png").toString()));
 
             // Create expandable Exception.
             StringWriter sw = new StringWriter();

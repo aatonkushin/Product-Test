@@ -13,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -67,7 +68,6 @@ import javafx.util.converter.IntegerStringConverter;
 import javafx.util.converter.NumberStringConverter;
 import producttest.bll.BLogic;
 import producttest.bll.IValueChanged;
-import producttest.helpers.ErrorDialog;
 import producttest.helpers.FloatPassCallback;
 import producttest.helpers.FloatStatCallback;
 import producttest.helpers.FloatStatWORoundCallback;
@@ -1097,7 +1097,7 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
         if (pp == null || pp.getPartNum() == null || pp.getPartNum().isEmpty()) {
             return;
         }
-        
+
         FXMLLoader root;
         try {
             root = new FXMLLoader(getClass().getResource("ProductPassportPrintDialog.fxml"));
@@ -1122,19 +1122,14 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
     @FXML
     private void tabProductReportOnSelectionChanged(Event event) {
         if (tabProductReport.isSelected()) {
-            try {
-                blogic.updateProductsReport();
-                System.out.println("Кол-во записей в Отчёте по ГП: "+blogic.getProductsReport().size());
-                
-                AnchorPane ap = (AnchorPane)tabProductReport.getContent();
-                for(Node n : ap.getChildren()){
-                    ((ProductReportControl)n).init(blogic);
+            Locale.setDefault(new Locale("ru"));
+                AnchorPane ap = (AnchorPane) tabProductReport.getContent();
+                for (Node n : ap.getChildren()) {
+                    ((ProductReportControl) n).init(blogic);
                     break;
                 }
-            } catch (SQLException | ParseException ex) {
-                ErrorDialog dialog = new ErrorDialog(AlertType.ERROR, "Ошибка загрузки данных в таблицу ", ex);
-                dialog.showAndWait();
-            }
+        } else {
+            Locale.setDefault(new Locale("en"));
         }
     }
 

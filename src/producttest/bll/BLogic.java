@@ -72,6 +72,21 @@ public class BLogic {
     private ObservableList<RequiredDensity> requiredDensities;          //Требуемые плотности.
     private ObservableList<RequiredDurability> requiredDurabilities;    //Требуемые прочности.
     private ObservableList<ProductPassport> productPassports;           //Паспорта продукции.
+
+     //Количество записей в таблице Отчёт по ГП.
+    private IntegerProperty productReportsCount;
+
+    public final void setProductReportsCount(Integer productReportsCount) {
+        this.productReportsCount.set(productReportsCount);
+    }
+
+    public final Integer getProductReportsCount() {
+        return this.productReportsCount.get();
+    }
+
+    public IntegerProperty productReportsCountProperty() {
+        return productReportsCount;
+    }
     
     private ObservableList<ProductReportRecord> productsReport;          //Отчёт по готовой продукции.
     
@@ -1453,15 +1468,15 @@ public class BLogic {
      * @throws SQLException
      * @throws ParseException 
      */
-    public void updateProductsReport() throws SQLException, ParseException{
+    public void updateProductsReport(Date dateFrom, Date dateTo, Boolean shortReport) throws SQLException, ParseException{
         if (productsReport == null) {
             productsReport = FXCollections.observableArrayList();
-            //TODO: productsReportItemsCount = new SimpleIntegerProperty();
+            productReportsCount = new SimpleIntegerProperty(0);
         }
         
         productsReport.clear();
-        productsReport.addAll(dc.getProductsReport());
-        //TODO: setProductsReportItemsCount
+        productsReport.addAll(dc.getProductsReport(dateFrom, dateTo, shortReport));
+        setProductReportsCount(productsReport.size());
     }
 
     /**

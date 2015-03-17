@@ -19,6 +19,7 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import oracle.jdbc.pool.OracleDataSource;
 import producttest.Config;
+import producttest.model.DefectType;
 import producttest.model.HumidityTest;
 import producttest.model.Month;
 import producttest.model.Part;
@@ -65,6 +66,12 @@ public class DataContext {
 
     //Список продукции для кэша.
     ArrayList<Product> products;
+
+    //Список видов дефектов для кэша.
+    ArrayList<DefectType> defectTypes;
+
+    int currentDensity = 0;     //Хранит информацию о плотности с момента последнего запроса.
+    int currentProductId = 0;   //Хранит информацию о типе продукции с момента последнего запроса.
 
     /**
      * Конструктор класса по-умолчанию.
@@ -822,8 +829,8 @@ public class DataContext {
 
         String partWhere = (part != null && part.getPartNum() != null) ? "AND T_Q_ST.PART_NO = '" + part.getPartNum() + "' " : "";
         String productWhere = (product != null && product.getName() != null) ? " AND T_Q_ST.PRODUCT_ID =" + product.getId() + " " : "";
-        String monthWhere = (month != null && month.getName() != null) ? " AND EXTRACT (MONTH FROM T_Q_ST.TEST_DATE) = " + month.getId() + " " : "";
-        String yearWhere = (year != null && year.getReturnValue() != 0) ? " AND EXTRACT (YEAR FROM T_Q_ST.TEST_DATE) = " + year.getReturnValue() + " " : "";
+        String monthWhere = (month != null && month.getName() != null) ? " AND EXTRACT (MONTH FROM T_Q_ST.PART_DATE) = " + month.getId() + " " : "";
+        String yearWhere = (year != null && year.getReturnValue() != 0) ? " AND EXTRACT (YEAR FROM T_Q_ST.PART_DATE) = " + year.getReturnValue() + " " : "";
         String densityWhere = (density != null && !density.equals("")) ? "AND T_Q_ST.DENSITY_MARK = '" + density + "' " : "";
         String durabilityWhere = (durability != null && !durability.equals("")) ? " AND T_Q_ST.DURABILITY_MARK = '" + durability + "' " : "";
 
@@ -1232,74 +1239,157 @@ public class DataContext {
     //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="Отчёт по готовой продукции">
-    public ArrayList<ProductReportRecord> getProductsReport() throws SQLException, ParseException {
+    /**
+     * Возвращает отчёт по готовой продукции.
+     *
+     * @param dateFrom - дата начала
+     * @param dateTo - дата окончания
+     * @param shortReport - true, если нужен отчёт в краткой форме.
+     * @return
+     * @throws SQLException
+     * @throws ParseException
+     */
+    public ArrayList<ProductReportRecord> getProductsReport(Date dateFrom, Date dateTo, Boolean shortReport) throws SQLException, ParseException {
         ArrayList<ProductReportRecord> retVal = new ArrayList<>();
 
         if (connection == null) {
             return retVal;
         }
 
-        String query = "SELECT cut.ID,\n"
-                + "  cut.PART_NO,\n"
-                + "  TO_CHAR(cut.DATE_TIME, 'dd.mm.yyyy') DAY,\n"
-                + "  cut.PRODUCT_ID,\n"
-                + "  prod.name prod_name,\n"
-                + "  cut.CAKE_QUANT,\n"
-                + "  cut.CAKE_QUANT * prod.CAKE_VOLUME volume,\n"
-                + "  cut.AUTOCLAVE_NO,\n"
-                + "  cut.DEF_TYPE_ID,\n"
-                + "  def.name def_name,\n"
-                + "  cut.RATE,\n"
-                + "  (SELECT HUMIDITY FROM T_Q_ST_HUMIDITY WHERE T_Q_ST_ID = pass.id and rownum = 1) HUMIDITY,\n"
-                + "  pass.AVG_DRY_DENSITY,\n"
-                + "  pass.DENSITY_MARK,\n"
-                + "  pass.AVG_DURABILITY,\n"
-                + "  pass.DURABILITY_MARK,\n"
-                + "  (SELECT HEAT_CONDUCTION FROM T_Q_PARAMETERS WHERE DENSITY = prod.density) HEAT_CONDUCTION,\n"
-                + "  (SELECT FROST_RESIST FROM T_Q_PARAMETERS WHERE DENSITY = prod.density) FROST_RESIST,\n"
-                + "  (SELECT STEAM_FACTOR FROM T_Q_PARAMETERS WHERE DENSITY = prod.density) STEAM_FACTOR,\n"
-                + "  (SELECT SHRINKAGE FROM T_Q_PARAMETERS WHERE DENSITY = prod.density) SHRINKAGE,\n"
-                + "  (SELECT ACTIVITY FROM T_Q_PARAMETERS WHERE DENSITY = prod.density) ACTIVITY\n"
-                + "FROM T_Q_CUTTING cut, T_Q_ST pass, T_PRODUCT prod, T_Q_DEF_TYPES def\n"
-                + "where \n"
-                + " cut.PART_NO = pass.PART_NO(+) \n"
-                + " and EXTRACT(year from cut.DATE_TIME) = EXTRACT(year from pass.PART_DATE)\n"
-                + " and cut.PRODUCT_ID = prod.ID(+) \n"
-                + " and cut.DEF_TYPE_ID = def.ID(+)\n"
-                + " order by cut.DATE_TIME desc";
+        DateFormat df = new SimpleDateFormat("dd.MM.YYYY");
 
-        Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-        
-        try (ResultSet rset = stmt.executeQuery(query)) {
-            while (rset.next()) {
-                DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-                Date d = df.parse(rset.getString("DAY"));
-                
-                ProductReportRecord prr = new ProductReportRecord();
-                prr.setId(rset.getInt("ID"));
-                prr.setPartNum(rset.getString("PART_NO"));
-                prr.setDate(d);
-                prr.setProductId(rset.getInt("PRODUCT_ID"));
-                prr.setProductName(rset.getString("prod_name"));
-                prr.setCakeQuantity(rset.getInt("CAKE_QUANT"));
-                prr.setVolume(rset.getFloat("volume"));
-                prr.setAutoclaveNo(rset.getInt("AUTOCLAVE_NO"));
-                prr.setDefTypeId(rset.getInt("DEF_TYPE_ID"));
-                prr.setDefName(rset.getString("def_name"));
-                prr.setDefRate(rset.getInt("RATE"));
-                prr.setHumidity(rset.getFloat("HUMIDITY"));
-                prr.setAvgDensity(rset.getFloat("AVG_DRY_DENSITY"));
-                prr.setDensityMark(rset.getString("DENSITY_MARK"));
-                prr.setAvgDurability(rset.getFloat("AVG_DURABILITY"));
-                prr.setDurabilityMark(rset.getString("DURABILITY_MARK"));
-                prr.setHeatConduction(rset.getFloat("HEAT_CONDUCTION"));
-                prr.setFrostResist(rset.getString("FROST_RESIST"));
-                prr.setSteamFactor(rset.getFloat("STEAM_FACTOR"));
-                prr.setShrinkage(rset.getFloat("SHRINKAGE"));
-                prr.setActivity(rset.getString("ACTIVITY"));
-                
-                retVal.add(prr);
+        String query;
+
+        //Короткий отчёт.
+        if (shortReport) {
+            query = "SELECT cut.PART_NO, cut.DATE_TIME, TO_CHAR(cut.DATE_TIME, 'dd.MM.YYYY') DAY, cut.PRODUCT_ID, cut.DEF_TYPE_ID, cut.RATE,  \n"
+                    + "(SELECT HUMIDITY FROM T_Q_ST_HUMIDITY WHERE T_Q_ST_ID = pass.id and rownum = 1) HUMIDITY,\n"
+                    + "pass.AVG_DRY_DENSITY,\n"
+                    + "pass.AVG_DURABILITY\n"
+                    + "FROM (SELECT ROW_NUMBER() OVER(PARTITION BY PART_NO order by DATE_TIME DESC) rn, \n"
+                    + "PART_NO, DATE_TIME, PRODUCT_ID, DEF_TYPE_ID, RATE\n"
+                    + "FROM T_Q_CUTTING\n"
+                    + "WHERE DATE_TIME BETWEEN TO_DATE('" + df.format(dateFrom) + "', 'DD.MM.YYYY') AND " + "TO_DATE('" + df.format(dateTo) + "', 'DD.MM.YYYY') \n"
+                    + "ORDER BY DATE_TIME desc) cut,  T_Q_ST pass\n"
+                    + "WHERE rn = 1 AND cut.PART_NO = pass.PART_NO(+) and pass.AVG_DRY_DENSITY is not null "
+                    + "ORDER BY cut.DATE_TIME desc";
+
+            Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+            try (ResultSet rset = stmt.executeQuery(query)) {
+                while (rset.next()) {
+                    //Дата.
+                    df = new SimpleDateFormat("dd.MM.yyyy");
+                    Date d = df.parse(rset.getString("DAY"));
+
+                    //Наименование продукции.
+                    String productName = "";
+                    for (Product p : getProducts()) {
+                        if (p.getId() == rset.getInt("PRODUCT_ID")) {
+                            productName = p.getName();
+                            break;
+                        }
+                    }
+
+                    //Наименование дефекта.
+                    String defName = "";
+                    for (DefectType dt : getDefectTypes()) {
+                        if (dt.getId() == rset.getInt("DEF_TYPE_ID")) {
+                            defName = dt.getName();
+                            break;
+                        }
+                    }
+
+                    //Создаём и заполняем сущность.
+                    ProductReportRecord prr = new ProductReportRecord();
+                    prr.setPartNum(rset.getString("PART_NO"));
+                    prr.setDate(d);
+                    prr.setProductId(rset.getInt("PRODUCT_ID"));
+                    prr.setProductName(productName);
+                    prr.setDefTypeId(rset.getInt("DEF_TYPE_ID"));
+                    prr.setDefName(defName);
+                    prr.setDefRate(rset.getInt("RATE"));
+                    prr.setHumidity(rset.getFloat("HUMIDITY"));
+                    prr.setAvgDensity(rset.getFloat("AVG_DRY_DENSITY"));
+                    prr.setAvgDurability(rset.getFloat("AVG_DURABILITY"));
+
+                    retVal.add(prr);
+                }
+
+                rset.close();
+
             }
+
+            stmt.close();
+
+        } else {
+            //Полный отчёт.
+            query = "SELECT cut.ID,\n"
+                    + "  cut.PART_NO,\n"
+                    + "  TO_CHAR(cut.DATE_TIME, 'dd.mm.yyyy') DAY,\n"
+                    + "  cut.PRODUCT_ID,\n"
+                    + "  prod.name prod_name,\n"
+                    + "  cut.CAKE_QUANT,\n"
+                    + "  cut.CAKE_QUANT * prod.CAKE_VOLUME volume,\n"
+                    + "  cut.AUTOCLAVE_NO,\n"
+                    + "  cut.DEF_TYPE_ID,\n"
+                    + "  def.name def_name,\n"
+                    + "  cut.RATE,\n"
+                    + "  (SELECT HUMIDITY FROM T_Q_ST_HUMIDITY WHERE T_Q_ST_ID = pass.id and rownum = 1) HUMIDITY,\n"
+                    + "  pass.AVG_DRY_DENSITY,\n"
+                    + "  pass.DENSITY_MARK,\n"
+                    + "  pass.AVG_DURABILITY,\n"
+                    + "  pass.DURABILITY_MARK,\n"
+                    + "  (SELECT HEAT_CONDUCTION FROM T_Q_PARAMETERS WHERE DENSITY = prod.density) HEAT_CONDUCTION,\n"
+                    + "  (SELECT FROST_RESIST FROM T_Q_PARAMETERS WHERE DENSITY = prod.density) FROST_RESIST,\n"
+                    + "  (SELECT STEAM_FACTOR FROM T_Q_PARAMETERS WHERE DENSITY = prod.density) STEAM_FACTOR,\n"
+                    + "  (SELECT SHRINKAGE FROM T_Q_PARAMETERS WHERE DENSITY = prod.density) SHRINKAGE,\n"
+                    + "  (SELECT ACTIVITY FROM T_Q_PARAMETERS WHERE DENSITY = prod.density) ACTIVITY\n"
+                    + "FROM T_Q_CUTTING cut, T_Q_ST pass, T_PRODUCT prod, T_Q_DEF_TYPES def\n"
+                    + "where cut.date_time BETWEEN TO_DATE('" + df.format(dateFrom) + "', 'DD.MM.YYYY') AND " + "TO_DATE('" + df.format(dateTo) + "', 'DD.MM.YYYY') AND \n"
+                    + " cut.PART_NO = pass.PART_NO(+) \n"
+                    + " and EXTRACT(year from cut.DATE_TIME) = EXTRACT(year from pass.PART_DATE)\n"
+                    + " and cut.PRODUCT_ID = prod.ID(+) \n"
+                    + " and cut.DEF_TYPE_ID = def.ID(+)\n"
+                    + " order by cut.DATE_TIME desc";
+
+            Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+            try (ResultSet rset = stmt.executeQuery(query)) {
+                while (rset.next()) {
+                    df = new SimpleDateFormat("dd.MM.yyyy");
+                    Date d = df.parse(rset.getString("DAY"));
+
+                    ProductReportRecord prr = new ProductReportRecord();
+                    prr.setId(rset.getInt("ID"));
+                    prr.setPartNum(rset.getString("PART_NO"));
+                    prr.setDate(d);
+                    prr.setProductId(rset.getInt("PRODUCT_ID"));
+                    prr.setProductName(rset.getString("prod_name"));
+                    prr.setCakeQuantity(rset.getInt("CAKE_QUANT"));
+                    prr.setVolume(rset.getFloat("volume"));
+                    prr.setAutoclaveNo(rset.getInt("AUTOCLAVE_NO"));
+                    prr.setDefTypeId(rset.getInt("DEF_TYPE_ID"));
+                    prr.setDefName(rset.getString("def_name"));
+                    prr.setDefRate(rset.getInt("RATE"));
+                    prr.setHumidity(rset.getFloat("HUMIDITY"));
+                    prr.setAvgDensity(rset.getFloat("AVG_DRY_DENSITY"));
+                    prr.setDensityMark(rset.getString("DENSITY_MARK"));
+                    prr.setAvgDurability(rset.getFloat("AVG_DURABILITY"));
+                    prr.setDurabilityMark(rset.getString("DURABILITY_MARK"));
+                    prr.setHeatConduction(rset.getFloat("HEAT_CONDUCTION"));
+                    prr.setFrostResist(rset.getString("FROST_RESIST"));
+                    prr.setSteamFactor(rset.getFloat("STEAM_FACTOR"));
+                    prr.setShrinkage(rset.getFloat("SHRINKAGE"));
+                    prr.setActivity(rset.getString("ACTIVITY"));
+
+                    retVal.add(prr);
+                }
+
+                rset.close();
+            }
+
+            stmt.close();
         }
 
         return retVal;
@@ -1307,9 +1397,6 @@ public class DataContext {
 //</editor-fold>
 
     //--------------------- Вспомогательные -------------------------------- //
-    int currentDensity = 0;     //Хранит информацию о плотности с момента последнего запроса.
-    int currentProductId = 0;   //Хранит информацию о типе продукции с момента последнего запроса.
-
     private int getDensityByProductId(int productId) throws SQLException {
         //Если код продукцции совпадает с предыдущим кодом, то просто возвращаем плотность для предыдущего продукта.
         if (productId == currentProductId) {
@@ -1339,5 +1426,45 @@ public class DataContext {
         }
 
         return density;
+    }
+
+    /**
+     * Возвращает список всех дефектов из БД.
+     *
+     * @return
+     * @throws SQLException
+     */
+    public ArrayList<DefectType> getDefectTypes() throws SQLException {
+        ArrayList<DefectType> retVal = new ArrayList<>();
+        
+        if (connection == null) {
+            return retVal;
+        }
+
+        if (defectTypes != null && defectTypes.size() > 0) {
+            return defectTypes;
+        }
+
+        String query = "SELECT ID, NAME, NOTES FROM T_Q_DEF_TYPES";
+
+        Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+        try (ResultSet rset = stmt.executeQuery(query)) {
+            while (rset.next()) {
+                DefectType dt = new DefectType();
+                dt.setId(rset.getInt("ID"));
+                dt.setName(rset.getString("NAME"));
+                dt.setNotes(rset.getString("NOTES"));
+
+                retVal.add(dt);
+            }
+
+            rset.close();
+        }
+
+        stmt.close();
+        
+        defectTypes = retVal;
+        return retVal;
     }
 }
