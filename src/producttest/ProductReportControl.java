@@ -14,7 +14,11 @@ import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,10 +26,14 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import javafx.util.converter.NumberStringConverter;
@@ -108,8 +116,25 @@ public class ProductReportControl extends VBox {
     @FXML
     private Label lblItemsCount;    //количество записей в таблице
 
+    @FXML
+    private VBox mainVBox;
+
+    @FXML
+    private MenuItem mnuCopy;
+
 //</editor-fold>
     BLogic blogic;
+
+    private boolean isInitialized = false;
+
+    /**
+     * Указывает на то, что элемент управления был инициализирован.
+     *
+     * @return
+     */
+    public boolean IsInitialized() {
+        return this.isInitialized;
+    }
 
     public ProductReportControl() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
@@ -122,6 +147,17 @@ public class ProductReportControl extends VBox {
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
+
+        //Отслеживаем высоту элемента управления для изменения высоты таблицы.
+        mainVBox.heightProperty().addListener(new ChangeListener<Number>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                tblProductReport.setPrefHeight(tblProductReport.getPrefHeight() + ((Double) newValue - (Double) oldValue));
+                //System.out.println("ProductReportControloldValue: " + oldValue +"|" + newValue);
+                //System.out.println("tblProductReport height: "+ tblProductReport.getHeight());
+            }
+        });
     }
 
     /**
@@ -188,7 +224,7 @@ public class ProductReportControl extends VBox {
 
         colAvgDensity.setCellValueFactory(new PropertyValueFactory<>("avgDensity"));
         colAvgDensity.setCellFactory(new FloatProductReportCallback(false));
-        
+
         colDensityMark.setCellValueFactory(new PropertyValueFactory<>("densityMark"));
 
         colAvgDurability.setCellValueFactory(new PropertyValueFactory<>("avgDurability"));
@@ -210,11 +246,14 @@ public class ProductReportControl extends VBox {
         colShrinkage.setCellFactory(new FloatProductReportCallback(false));
 
         //loadProductsReport(); //загрузка происходит в обработчиках dateTo и dateFrom.
-
         //Заполняем таблицу из базы данных.
         tblProductReport.setItems(blogic.getProductsReport());
+        tblProductReport.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+        //Количество записей в таблице.
         lblItemsCount.textProperty().bindBidirectional(blogic.productReportsCountProperty(), new NumberStringConverter());
+
+        isInitialized = true;
     }
 
     /**
@@ -224,12 +263,13 @@ public class ProductReportControl extends VBox {
         if (dateFrom.getValue() == null || dateTo.getValue() == null) {
             return;
         }
-        
-        Boolean shortReport =  false;
-        
-        if (comboReportType.getSelectionModel().getSelectedIndex() == 3)
+
+        Boolean shortReport = false;
+
+        if (comboReportType.getSelectionModel().getSelectedIndex() == 3) {
             shortReport = true;
-        
+        }
+
         Instant instantFrom = dateFrom.getValue().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
         Instant instantTo = dateTo.getValue().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
 
@@ -268,8 +308,7 @@ public class ProductReportControl extends VBox {
             colHeatconduction.setVisible(false);
             colSteamfactor.setVisible(false);
             colShrinkage.setVisible(false);
-        }
-        else if (comboReportType.getSelectionModel().getSelectedIndex() == 1) {
+        } else if (comboReportType.getSelectionModel().getSelectedIndex() == 1) {
             //Отображение только дефектов.
             colPartNum.setVisible(true);
             colDate.setVisible(true);
@@ -289,8 +328,7 @@ public class ProductReportControl extends VBox {
             colHeatconduction.setVisible(false);
             colSteamfactor.setVisible(false);
             colShrinkage.setVisible(false);
-        }
-        else if(comboReportType.getSelectionModel().getSelectedIndex() == 2){
+        } else if (comboReportType.getSelectionModel().getSelectedIndex() == 2) {
             //Отображение полного отчёта.
             colPartNum.setVisible(true);
             colDate.setVisible(true);
@@ -328,7 +366,7 @@ public class ProductReportControl extends VBox {
             colHeatconduction.setVisible(false);
             colSteamfactor.setVisible(false);
             colShrinkage.setVisible(false);
-        } else if(comboReportType.getSelectionModel().getSelectedIndex() == 4){
+        } else if (comboReportType.getSelectionModel().getSelectedIndex() == 4) {
             //Отображение отчёта с характеристиками.
             colPartNum.setVisible(true);
             colDate.setVisible(true);
@@ -359,5 +397,25 @@ public class ProductReportControl extends VBox {
     private void dateToOnChanged(ActionEvent e) {
         loadProductsReport();
     }
+
+    @FXML
+    private void mnuCopyOnAction(ActionEvent event) {
+        ObservableList rowList = (ObservableList) tblProductReport.getSelectionModel().getSelectedItems();
+
+        StringBuilder clipboardString = new StringBuilder();
+
+        for (Iterator it = rowList.iterator(); it.hasNext();) {
+            ProductReportRecord row = (ProductReportRecord) it.next();
+
+                clipboardString.append(row);
+            clipboardString.append('\n');
+
+        }
+        final ClipboardContent content = new ClipboardContent();
+
+        content.putString(clipboardString.toString());
+        Clipboard.getSystemClipboard().setContent(content);
+    }
+
 //</editor-fold>
 }

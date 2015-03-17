@@ -5,7 +5,10 @@
  */
 package producttest.model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import javax.swing.text.DateFormatter;
 
 /**
  * Класс, представляющий запись в таблице: Отчёт по готовой продукции.
@@ -326,5 +329,14 @@ public class ProductReportRecord {
      */
     public void setShrinkage(float shrinkage) {
         this.shrinkage = shrinkage;
+    }
+    
+    @Override
+    public String toString(){
+        DateFormat df = new SimpleDateFormat("dd.MM.YYYY");
+        return partNum + "\t"+ df.format(date) + "\t"+productName+"\t" 
+                + volume + "\t"+autoclaveNo +"\t"+defName +"\t"+defRate +"\t"
+                + humidity  +"\t" + avgDensity +"\t"+densityMark +"\t"+avgDurability  +"\t"
+                + durabilityMark;
     }
 }

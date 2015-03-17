@@ -35,5 +35,4 @@ public class IntegerProductReportCallback implements Callback<TableColumn<Produc
             }
         };
     }
-
 }

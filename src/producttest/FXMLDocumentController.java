@@ -311,6 +311,11 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
     private Label tblPassportsItemsCount;
     @FXML
     private Tab tabProductReport;
+    @FXML
+    private AnchorPane mainAcnchorPane;
+
+    @FXML
+    private ProductReportControl productReportControl;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -463,6 +468,22 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
 
         //Устанавливаем ро, так как из SceneBuilder не получается.
         lblRho.setText("\u03c1");
+
+        //Отслеживаем высоту главного экрана, для изменения высоты компонентов.
+        mainAcnchorPane.heightProperty().addListener(new ChangeListener<Number>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                //System.out.println(oldValue + "|" + newValue);
+                productReportControl.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+                if (((Double) oldValue) == 0.0) {
+                    return;
+                }
+                tblPassports.setPrefHeight(tblPassports.getPrefHeight() + ((Double) newValue - (Double) oldValue));
+                tblStatistics.setPrefHeight(tblStatistics.getPrefHeight() + ((Double) newValue - (Double) oldValue));
+            }
+        });
     }
 
     /**
@@ -1123,11 +1144,18 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
     private void tabProductReportOnSelectionChanged(Event event) {
         if (tabProductReport.isSelected()) {
             Locale.setDefault(new Locale("ru"));
-                AnchorPane ap = (AnchorPane) tabProductReport.getContent();
-                for (Node n : ap.getChildren()) {
-                    ((ProductReportControl) n).init(blogic);
-                    break;
-                }
+            /*      AnchorPane ap = (AnchorPane) tabProductReport.getContent();
+             for (Node n : ap.getChildren()) {
+             ProductReportControl ppc = (ProductReportControl) n;
+             if (!ppc.IsInitialized()) {
+             ppc.init(blogic);
+             }
+             break;
+            
+             } */
+            if (!productReportControl.IsInitialized()) {
+                productReportControl.init(blogic);
+            }
         } else {
             Locale.setDefault(new Locale("en"));
         }

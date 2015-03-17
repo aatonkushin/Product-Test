@@ -7,7 +7,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root minWidth="800.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root fx:id="mainVBox" minWidth="800.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox alignment="CENTER_LEFT" spacing="5.0">
          <children>
@@ -26,7 +26,7 @@
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </VBox.margin>
       </HBox>
-      <TableView fx:id="tblProductReport" prefHeight="650.0">
+      <TableView fx:id="tblProductReport" maxHeight="1.7976931348623157E308" prefHeight="650.0">
         <columns>
           <TableColumn fx:id="colPartNum" prefWidth="75.0" text="    №&#10;партии" />
           <TableColumn fx:id="colDate" prefWidth="75.0" text="Дата" />
@@ -39,17 +39,17 @@
             </TableColumn>
             <TableColumn prefWidth="75.0" text="Дефекты">
                <columns>
-                  <TableColumn fx:id="colDefName" prefWidth="75.0" text="Вид" />
-                  <TableColumn fx:id="colDefRate" prefWidth="75.0" text="Интенсивность" />
+                  <TableColumn fx:id="colDefName" minWidth="80.0" prefWidth="-1.0" text="Вид" />
+                  <TableColumn fx:id="colDefRate" minWidth="80.0" prefWidth="-1.0" text="Интенсивность" />
                </columns>
             </TableColumn>
             <TableColumn prefWidth="75.0" text="Характеристики">
                <columns>
-                  <TableColumn fx:id="colHumidity" prefWidth="75.0" text="Влажность,&#10;%" />
-                  <TableColumn fx:id="colAvgDensity" prefWidth="75.0" text="Средняя плотность,&#10;кг/см3" />
-                  <TableColumn fx:id="colDensityMark" prefWidth="75.0" text="Марка&#10;по плотности" />
-                  <TableColumn fx:id="colAvgDurability" prefWidth="75.0" text="Предел прочности&#10;при сжатии,&#10;кг/см3" />
-                  <TableColumn fx:id="colDurabilityMark" prefWidth="75.0" text="Класс&#10;по прочности" />
+                  <TableColumn fx:id="colHumidity" prefWidth="75.0" text="Влажность,&#10;&#9;%" />
+                  <TableColumn fx:id="colAvgDensity" prefWidth="95.0" text="&#9;Средняя &#10;плотность, кг/см3" />
+                  <TableColumn fx:id="colDensityMark" prefWidth="90.0" text="      Марка&#10;по плотности" />
+                  <TableColumn fx:id="colAvgDurability" prefWidth="119.0" text="Предел прочности&#10;&#9;при сжатии,&#10;&#9;    кг/см3" />
+                  <TableColumn fx:id="colDurabilityMark" prefWidth="75.0" text="&#9;Класс&#10;по прочности" />
                   <TableColumn fx:id="colFrostresist" prefWidth="75.0" text="Морозостойкость" />
                   <TableColumn fx:id="colActivity" prefWidth="75.0" text="Удельная активность&#10;&#9;ЕРН,&#9;Бк/кг" />
                   <TableColumn fx:id="colHeatconduction" prefWidth="75.0" text="Теплопроводность,&#10;&#9;  Вт/мoC" />
@@ -59,8 +59,15 @@
             </TableColumn>
         </columns>
          <VBox.margin>
-            <Insets left="12.0" />
+            <Insets left="5.0" right="5.0" />
          </VBox.margin>
+         <contextMenu>
+            <ContextMenu>
+              <items>
+                <MenuItem fx:id="mnuCopy" mnemonicParsing="false" onAction="#mnuCopyOnAction" text="Копировать" />
+              </items>
+            </ContextMenu>
+         </contextMenu>
       </TableView>
       <HBox>
          <children>

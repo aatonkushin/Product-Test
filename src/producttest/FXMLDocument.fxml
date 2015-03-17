@@ -11,7 +11,7 @@
 <?import producttest.*?>
 <?scenebuilder-classpath-element C:/Users/tonkushin/Documents/NetBeansProjects/ProductTest/distProductTest.jar ?>
 
-<AnchorPane id="AnchorPane" prefWidth="980.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="producttest.FXMLDocumentController">
+<AnchorPane id="AnchorPane" fx:id="mainAcnchorPane" prefWidth="980.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="producttest.FXMLDocumentController">
     <children>
       <TabPane fx:id="tabPane" prefHeight="689.0" prefWidth="975.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
@@ -332,9 +332,9 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <VBox>
+                        <VBox AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                            <children>
-                              <GridPane fx:id="grdStatisticsContols" hgap="10.0">
+                              <GridPane fx:id="grdStatisticsContols" hgap="10.0" maxWidth="941.0" prefWidth="941.0">
                                 <columnConstraints>
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
@@ -369,73 +369,73 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                  </padding>
                               </GridPane>
+                              <TableView fx:id="tblStatistics" onMouseClicked="#tblStatisticsOnMouseClicked" prefHeight="338.0" prefWidth="938.0">
+                                <columns>
+                                  <TableColumn fx:id="colDateStat" prefWidth="62.0" text="Дата" />
+                                  <TableColumn fx:id="colPartNumStat" prefWidth="74.0" text="№ партии" />
+                                    <TableColumn fx:id="colProdNameStat" prefWidth="99.0" text="Наименование" />
+                                    <TableColumn fx:id="colReqDensityStat" prefWidth="71.0" text="Требуемая&#10;плотность" />
+                                    <TableColumn fx:id="colReqDurabilityStat" prefWidth="69.0" text="Требуемая&#10;прочность&#10;" />
+                                    <TableColumn fx:id="colDryDensityStat" prefWidth="75.0" text="Плотность&#10;сух." />
+                                    <TableColumn fx:id="colDensityMarkStat" prefWidth="65.0" text="Марка по&#10;плотности" />
+                                    <TableColumn fx:id="colDensityVariationStat" prefWidth="84.0" text="Коэф. вар.&#10;по плотности" />
+                                    <TableColumn fx:id="colDurabilityStat" prefWidth="94.0" text="Предел прочн.&#10;при сжатии" />
+                                    <TableColumn fx:id="colDurabilityMarkStat" prefWidth="69.0" text="Класс по&#10;прочности" />
+                                    <TableColumn fx:id="colDurabilityVarStat" prefWidth="87.0" text="Коэф. вар.&#10;по прочности" />
+                                    <TableColumn fx:id="colPersonStat" prefWidth="69.0" text="Сотрудник" />
+                                </columns>
+                              </TableView>
+                              <GridPane>
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.0" minWidth="10.0" prefWidth="88.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="112.0" minWidth="10.0" prefWidth="112.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Label text="Всего записей:" />
+                                    <Label fx:id="tblStatisticsItemsCount" text="-" GridPane.columnIndex="1">
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </GridPane>
+                              <GridPane prefWidth="941.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <TableView fx:id="tblRequiredDensity" prefHeight="160.0" prefWidth="462.0">
+                                      <columns>
+                                        <TableColumn fx:id="colDensityMarkReq" prefWidth="129.0" text="Марка по плотности" />
+                                        <TableColumn fx:id="colReqDensityReq" prefWidth="169.0" text="Требуемая плотность" />
+                                      </columns>
+                                       <GridPane.margin>
+                                          <Insets left="4.0" right="5.0" />
+                                       </GridPane.margin>
+                                    </TableView>
+                                    <TableView fx:id="tblRequiredDurability" prefHeight="160.0" prefWidth="200.0" GridPane.columnIndex="1">
+                                      <columns>
+                                        <TableColumn fx:id="colDurabilityMarkReq" prefWidth="128.0" text="Класс прочности" />
+                                        <TableColumn fx:id="colReqDurabilityReq" minWidth="0.0" prefWidth="196.0" text="Требуемая прочность бетона" />
+                                      </columns>
+                                       <GridPane.margin>
+                                          <Insets left="5.0" />
+                                       </GridPane.margin>
+                                    </TableView>
+                                 </children>
+                                 <padding>
+                                    <Insets top="5.0" />
+                                 </padding>
+                              </GridPane>
                            </children>
                         </VBox>
-                        <TableView fx:id="tblStatistics" layoutX="4.0" layoutY="130.0" onMouseClicked="#tblStatisticsOnMouseClicked" prefHeight="338.0" prefWidth="938.0">
-                          <columns>
-                            <TableColumn fx:id="colDateStat" prefWidth="62.0" text="Дата" />
-                            <TableColumn fx:id="colPartNumStat" prefWidth="74.0" text="№ партии" />
-                              <TableColumn fx:id="colProdNameStat" prefWidth="99.0" text="Наименование" />
-                              <TableColumn fx:id="colReqDensityStat" prefWidth="71.0" text="Требуемая&#10;плотность" />
-                              <TableColumn fx:id="colReqDurabilityStat" prefWidth="69.0" text="Требуемая&#10;прочность&#10;" />
-                              <TableColumn fx:id="colDryDensityStat" prefWidth="75.0" text="Плотность&#10;сух." />
-                              <TableColumn fx:id="colDensityMarkStat" prefWidth="65.0" text="Марка по&#10;плотности" />
-                              <TableColumn fx:id="colDensityVariationStat" prefWidth="84.0" text="Коэф. вар.&#10;по плотности" />
-                              <TableColumn fx:id="colDurabilityStat" prefWidth="94.0" text="Предел прочн.&#10;при сжатии" />
-                              <TableColumn fx:id="colDurabilityMarkStat" prefWidth="69.0" text="Класс по&#10;прочности" />
-                              <TableColumn fx:id="colDurabilityVarStat" prefWidth="87.0" text="Коэф. вар.&#10;по прочности" />
-                              <TableColumn fx:id="colPersonStat" prefWidth="69.0" text="Сотрудник" />
-                          </columns>
-                        </TableView>
-                        <GridPane layoutX="4.0" layoutY="468.0">
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.0" minWidth="10.0" prefWidth="88.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="112.0" minWidth="10.0" prefWidth="112.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <Label text="Всего записей:" />
-                              <Label fx:id="tblStatisticsItemsCount" text="-" GridPane.columnIndex="1">
-                                 <font>
-                                    <Font name="System Bold" size="12.0" />
-                                 </font>
-                              </Label>
-                           </children>
-                        </GridPane>
-                        <GridPane layoutY="492.0" prefWidth="941.0">
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <TableView fx:id="tblRequiredDensity" prefHeight="160.0" prefWidth="462.0">
-                                <columns>
-                                  <TableColumn fx:id="colDensityMarkReq" prefWidth="129.0" text="Марка по плотности" />
-                                  <TableColumn fx:id="colReqDensityReq" prefWidth="169.0" text="Требуемая плотность" />
-                                </columns>
-                                 <GridPane.margin>
-                                    <Insets left="4.0" right="5.0" />
-                                 </GridPane.margin>
-                              </TableView>
-                              <TableView fx:id="tblRequiredDurability" prefHeight="160.0" prefWidth="200.0" GridPane.columnIndex="1">
-                                <columns>
-                                  <TableColumn fx:id="colDurabilityMarkReq" prefWidth="128.0" text="Класс прочности" />
-                                  <TableColumn fx:id="colReqDurabilityReq" minWidth="0.0" prefWidth="196.0" text="Требуемая прочность бетона" />
-                                </columns>
-                                 <GridPane.margin>
-                                    <Insets left="5.0" />
-                                 </GridPane.margin>
-                              </TableView>
-                           </children>
-                           <padding>
-                              <Insets top="5.0" />
-                           </padding>
-                        </GridPane>
                      </children></AnchorPane>
             </content>
           </Tab>
@@ -509,9 +509,9 @@
             </Tab>
             <Tab fx:id="tabProductReport" onSelectionChanged="#tabProductReportOnSelectionChanged" text="Отчёт по ГП">
               <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0">
+                <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
                    <children>
-                    <ProductReportControl AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
+                    <ProductReportControl fx:id="productReportControl" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
                    </children>    
                 </AnchorPane>
               </content>

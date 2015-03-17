@@ -1084,7 +1084,7 @@ public class DataContext {
                 + "  HEAT_CONDUCTION, SHRINKAGE, ACTIVITY, NOTES, STRENGTH_CLASS,\n"
                 + "  HUMIDITY FROM T_Q_PASS WHERE EXTRACT(YEAR FROM DAY) = %d", year.getReturnValue());
 
-        query += monthWhere + " ORDER BY DAY DESC";
+        query += monthWhere + " ORDER BY DAY DESC, PART_NO DESC";
 
         try (ResultSet rset = stmt.executeQuery(query)) {
             while (rset.next()) {
