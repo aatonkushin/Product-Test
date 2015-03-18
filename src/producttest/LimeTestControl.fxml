@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root id="mainVBox" fx:id="mainVBox" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Accordion fx:id="accordion">
+        <panes>
+          <TitledPane fx:id="tabInterimDefs" animated="false" text="Промежуточные результаты определений">
+            <content>
+              <AnchorPane minHeight="575.0" minWidth="0.0">
+                     <children>
+                        <VBox prefHeight="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="5.0">
+                                 <children>
+                                    <Label text="Вид отчёта" />
+                                    <ComboBox fx:id="comboReportType" onAction="#comboReportTypeOnAction" prefWidth="200.0" />
+                                    <Label text="Период с">
+                                       <HBox.margin>
+                                          <Insets left="10.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <DatePicker fx:id="dateFrom" onAction="#dateFromOnAction" />
+                                    <Label text="по" />
+                                    <DatePicker fx:id="dateTo" onAction="#dateToOnAction" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="5.0">
+                                 <children>
+                                    <Button fx:id="btnAdd" mnemonicParsing="false" onAction="#btnAddOnAction" prefHeight="25.0" prefWidth="80.0" text="Добавить" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" right="5.0" top="5.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <TableView fx:id="tblInterimDefs" prefHeight="600.0">
+                                <columns>
+                                  <TableColumn fx:id="colDate" prefWidth="75.0" text="Дата" />
+                                  <TableColumn fx:id="colPlace" prefWidth="75.0" text="Место&#10;отбора" />
+                                    <TableColumn fx:id="colSupplier" prefWidth="75.0" text="Производитель" />
+                                    <TableColumn prefWidth="158.0" text="Определение CaO+MgO">
+                                       <columns>
+                                          <TableColumn fx:id="colCaoMgoHclVolume" prefWidth="75.0" text="Объём &#10;HCL, мл" />
+                                          <TableColumn fx:id="colCaoMgoTitre" prefWidth="75.0" text="Титр &#10;CaO, г" />
+                                          <TableColumn fx:id="colCaoMgoWeight" prefWidth="75.0" text="   Масса&#10;навески, г" />
+                                       </columns>
+                                    </TableColumn>
+                                    <TableColumn prefWidth="75.0" text="Оценка гашения">
+                                       <columns>
+                                          <TableColumn fx:id="colLimeTime" prefWidth="75.0" text=" Время, &#10;мин/сек" />
+                                          <TableColumn fx:id="colLimeTemp" prefWidth="75.0" text="Температура,&#10;      град C" />
+                                       </columns>
+                                    </TableColumn>
+                                    <TableColumn prefWidth="75.0" text="Оценка удельной поверхности">
+                                       <columns>
+                                          <TableColumn fx:id="colSaMatVolume" prefWidth="75.0" text="Объём слоя, &#10;     см. куб." />
+                                          <TableColumn fx:id="colSaMatDensity" prefWidth="75.0" text="Истинная плотность, &#10;          г/см. куб." />
+                                          <TableColumn fx:id="colSaWeightLime" prefWidth="75.0" text="Навеска, г" />
+                                          <TableColumn fx:id="colSaDeviceConstant" prefWidth="75.0" text="Постоянная &#10;   прибора" />
+                                          <TableColumn fx:id="colSaTime" prefWidth="75.0" text="Время стекания &#10;  жидкости, сек" />
+                                          <TableColumn fx:id="colSaTemp" prefWidth="75.0" text="  Температура&#10;вохдуха, град С" />
+                                       </columns>
+                                    </TableColumn>
+                                    <TableColumn prefWidth="75.0" text="Определение MgO">
+                                       <columns>
+                                          <TableColumn fx:id="colMgoTrilonVolCaoMgo" prefWidth="75.0" text="Объем&#10;трилона Б&#10;CaO+MgO, мл" />
+                                          <TableColumn fx:id="colMgoTrilonVolCao" prefWidth="75.0" text="Объем&#10;трилона Б&#10;CaO, мл" />
+                                          <TableColumn fx:id="colMgoTitre" prefWidth="75.0" text="Титр MgO, г" />
+                                          <TableColumn fx:id="colMgoWeight" prefWidth="75.0" text="   Масса&#10;навески, г" />
+                                       </columns>
+                                    </TableColumn>
+                                    <TableColumn fx:id="colController" prefWidth="75.0" text="Лаборант" />
+                                </columns>
+                              </TableView>
+                              <HBox prefWidth="200.0" spacing="5.0">
+                                 <children>
+                                    <Label text="Всего записей:" />
+                                    <Label fx:id="lblItemsCount" text="Label" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </VBox.margin>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </TitledPane>
+          <TitledPane animated="false" expanded="false" text="Кривая гашения">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            </content>
+          </TitledPane>
+          <TitledPane animated="false" expanded="false" text="Итоговые результаты">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            </content>
+          </TitledPane>
+        </panes>
+      </Accordion>
+   </children>
+</fx:root>
