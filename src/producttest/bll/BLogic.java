@@ -1522,10 +1522,14 @@ public class BLogic {
      * @param ht - сущность класса оценки влажности
      * @return true - если удалено.
      */
-    public boolean RemoveHumidityTest(HumidityTest ht) {
+    public boolean RemoveHumidityTest(HumidityTest ht) throws SQLException {
+        dc.removeHumidityTest(ht);
         return humidityTests.remove(ht);
     }
 
+    /**
+     * Выполняет подключение к базе данных.
+     */
     public void connectToDB() {
         try {
             //Подключение к БД.

@@ -68,6 +68,7 @@ import javafx.util.converter.IntegerStringConverter;
 import javafx.util.converter.NumberStringConverter;
 import producttest.bll.BLogic;
 import producttest.bll.IValueChanged;
+import producttest.helpers.ErrorDialog;
 import producttest.helpers.FloatPassCallback;
 import producttest.helpers.FloatStatCallback;
 import producttest.helpers.FloatStatWORoundCallback;
@@ -861,7 +862,14 @@ public class FXMLDocumentController implements Initializable, IValueChanged {
 
     @FXML
     private void btnRemoveBottleOnAction(ActionEvent event) {
-        blogic.RemoveHumidityTest(tblHumidity.getSelectionModel().getSelectedItem());
+        
+        try {
+            blogic.RemoveHumidityTest(tblHumidity.getSelectionModel().getSelectedItem());
+        } catch (SQLException ex) {
+            Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
+            ErrorDialog dlg = new ErrorDialog(AlertType.ERROR, "Ошибка удаления записи об испытаниях на влажность.", ex);
+            dlg.showAndWait();
+        }
     }
 
     @FXML

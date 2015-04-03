@@ -91,14 +91,15 @@ public abstract class Calculation {
      */
     public static String calcDensityMark(Double density) {
         String retVal = "";
+        long roundedDensity = Math.round(density);
 
-        if (density >= 0d && density <= 350d) {
+        if (roundedDensity >= 0 && roundedDensity <= 350) {
             retVal = "D300";
-        } else if (density >= 351d && density <= 450d) {
+        } else if (roundedDensity >= 351 && roundedDensity <= 450) {
             retVal = "D400";
-        } else if (density >= 451d && density <= 550d) {
+        } else if (roundedDensity >= 451 && roundedDensity <= 550) {
             retVal = "D500";
-        } else if (density >= 551d) {
+        } else if (roundedDensity >= 551) {
             retVal = "D600";
         }
 
@@ -331,7 +332,7 @@ public abstract class Calculation {
      */
     public static Double calcDensityVariationByParts(ArrayList<Double> vars) {
         //Проверяем, что число результатов испытаний более 30.
-        if (vars.size() < 30) {
+        if (vars.size() < 5) {
             return 0d;
         }
 

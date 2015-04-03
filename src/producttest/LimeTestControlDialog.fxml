@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="producttest.LimeTestControlDialogController">
+   <children>
+      <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Accordion fx:id="accordion">
+              <panes>
+                <TitledPane fx:id="paneMain" animated="false" text="Ввод данных об испытании извести">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0">
+                           <children>
+                              <GridPane layoutX="18.6" layoutY="19.6" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Label text="Дата" />
+                                    <Label text="Лаборант" GridPane.rowIndex="1" />
+                                    <Label text="Место отбора" GridPane.rowIndex="2" />
+                                    <Label text="Производитель" GridPane.rowIndex="3" />
+                                    <Label text="Тип извести" GridPane.rowIndex="4" />
+                                    <Label text="Объем HCl" GridPane.rowIndex="5" />
+                                    <Label text="Титр CaO" GridPane.rowIndex="6" />
+                                    <Label text="Масса навески" GridPane.rowIndex="7" />
+                                    <Label text="Объем слоя" GridPane.rowIndex="8" />
+                                    <Label text="Истинная плотность" GridPane.rowIndex="9" />
+                                    <Label text="Навеска" GridPane.rowIndex="10" />
+                                    <Label text="Постоянная прибора" GridPane.rowIndex="11" />
+                                    <Label text="Время снижения жидкости" GridPane.rowIndex="12" />
+                                    <Label text="Температура окружающей среды" GridPane.rowIndex="13">
+                                       <GridPane.margin>
+                                          <Insets right="5.0" />
+                                       </GridPane.margin></Label>
+                                    <Label text="Объем трилона Б CaO+MgO" GridPane.rowIndex="14" />
+                                    <Label text="Объем трилона Б CaO" GridPane.rowIndex="15" />
+                                    <Label text="Титр MgO" GridPane.rowIndex="16" />
+                                    <Label text="Масса навески" GridPane.rowIndex="17" />
+                                    <DatePicker prefWidth="180.0" GridPane.columnIndex="1" />
+                                    <ComboBox prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <ComboBox prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <ComboBox prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <ComboBox prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                    <TextField GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                    <TextField GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                    <TextField GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                                    <TextField GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                                    <TextField GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                                    <TextField GridPane.columnIndex="1" GridPane.rowIndex="10" />
+                                    <TextField GridPane.columnIndex="1" GridPane.rowIndex="11" />
+                                    <TextField GridPane.columnIndex="1" GridPane.rowIndex="12" />
+                                    <TextField GridPane.columnIndex="1" GridPane.rowIndex="13" />
+                                    <TextField GridPane.columnIndex="1" GridPane.rowIndex="14" />
+                                    <TextField GridPane.columnIndex="1" GridPane.rowIndex="15" />
+                                    <TextField GridPane.columnIndex="1" GridPane.rowIndex="16" />
+                                    <TextField GridPane.columnIndex="1" GridPane.rowIndex="17" />
+                                    <Label text="мл" GridPane.columnIndex="2" GridPane.rowIndex="5">
+                                       <GridPane.margin>
+                                          <Insets left="5.0" />
+                                       </GridPane.margin>
+                                    </Label>
+                                    <Label text="г" GridPane.columnIndex="2" GridPane.rowIndex="6">
+                                       <GridPane.margin>
+                                          <Insets left="5.0" />
+                                       </GridPane.margin>
+                                    </Label>
+                                    <Label text="г" GridPane.columnIndex="2" GridPane.rowIndex="7">
+                                       <padding>
+                                          <Insets left="5.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="см. куб." GridPane.columnIndex="2" GridPane.rowIndex="8">
+                                       <padding>
+                                          <Insets left="5.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="г/см. куб." GridPane.columnIndex="2" GridPane.rowIndex="9">
+                                       <padding>
+                                          <Insets left="5.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="г" GridPane.columnIndex="2" GridPane.rowIndex="10">
+                                       <padding>
+                                          <Insets left="5.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="сек" GridPane.columnIndex="2" GridPane.rowIndex="12">
+                                       <padding>
+                                          <Insets left="5.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="град. С" GridPane.columnIndex="2" GridPane.rowIndex="13">
+                                       <padding>
+                                          <Insets left="5.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="мл" GridPane.columnIndex="2" GridPane.rowIndex="14">
+                                       <padding>
+                                          <Insets left="5.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="мл" GridPane.columnIndex="2" GridPane.rowIndex="15">
+                                       <padding>
+                                          <Insets left="5.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="г" GridPane.columnIndex="2" GridPane.rowIndex="16">
+                                       <padding>
+                                          <Insets left="5.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="г" GridPane.columnIndex="2" GridPane.rowIndex="17">
+                                       <padding>
+                                          <Insets left="5.0" />
+                                       </padding>
+                                    </Label>
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </TitledPane>
+                <TitledPane fx:id="paneSecond" animated="false" text="Время гашения извести">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                  </content>
+                </TitledPane>
+              </panes>
+            </Accordion>
+            <HBox alignment="CENTER_RIGHT" spacing="5.0">
+               <children>
+                  <Button defaultButton="true" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="ОК" />
+                  <Button cancelButton="true" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="Отмена" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

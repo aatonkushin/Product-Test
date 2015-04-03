@@ -138,6 +138,8 @@ public class DataContext {
                 n++;
             }
 
+            rset.close();
+            stmt.close();
             //System.out.println("\nLoaded: " + n);
         }
         /*
@@ -193,6 +195,9 @@ public class DataContext {
             while (rset.next()) {
                 retVal.add(new Person(rset.getInt(2), rset.getString(1)));
             }
+            
+            rset.close();
+            stmt.close();
         }
         return retVal;
     }
@@ -274,7 +279,8 @@ public class DataContext {
 
             //System.out.println("\nUpdating: " + query);
             stmt.execute(query);
-
+            rset.close();
+            stmt.close();
             return 2;
         } else {
             //...иначе добавляем новую запись.
@@ -295,9 +301,9 @@ public class DataContext {
 
             //System.out.println("\nInserting: " + query);
             stmt.execute(query);
-
+            
             rset.close();
-
+            stmt.close();
             return 1;
         }
     }
@@ -355,6 +361,8 @@ public class DataContext {
 
             //System.out.println("\nExecuting query: " + query);
             stmt.executeQuery(query);
+            rset.close();
+            stmt.close();
             return 2;
         } //... иначе вставляем новую запись.
         else {
@@ -369,10 +377,23 @@ public class DataContext {
             rset.close();
 
             stmt.execute(query);
+            stmt.close();
             return 1;
         }
     }
 
+    /**
+     * Добавляет или обновляет запись о испытании на влажность.
+     *
+     * @param testId
+     * @param bottleNum
+     * @param bottleWeight
+     * @param wetWeight
+     * @param dryWeight
+     * @param humidity
+     * @return
+     * @throws SQLException
+     */
     public int addOrUpdateHumidity(int testId, int bottleNum, Double bottleWeight, Double wetWeight, Double dryWeight, Double humidity) throws SQLException {
         if (connection == null) {
             return 0;
@@ -399,6 +420,8 @@ public class DataContext {
 
             //System.out.println("\nUpdating: " + query);
             stmt.executeQuery(query);
+            rset.close();
+            stmt.close();
             return 2;
         } else {
             stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -407,9 +430,30 @@ public class DataContext {
 
             //System.out.println("\nInserting: " + query);
             stmt.execute(query);
-
+            rset.close();
+            stmt.close();
             return 1;
         }
+    }
+
+    /**
+     * Удаляет запись об испытании на влажность.
+     *
+     * @param humidityTest
+     * @throws SQLException
+     */
+    public void removeHumidityTest(HumidityTest humidityTest) throws SQLException {
+        if (connection == null) {
+            return;
+        }
+
+        String query = "DELETE FROM T_Q_ST_HUMIDITY WHERE ID = " + humidityTest.getId();
+
+        Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+        stmt.executeUpdate(query);
+
+        stmt.close();
     }
 
     /**
@@ -441,6 +485,8 @@ public class DataContext {
             retVal = rset.getInt(1);
         }
 
+        rset.close();
+        stmt.close();
         return retVal;
     }
 
@@ -494,6 +540,9 @@ public class DataContext {
 
                 retVal.setApplyRatios(rset.getBoolean(23));
             }
+
+            rset.close();
+            stmt.close();
         }
 
         return retVal;
@@ -531,6 +580,7 @@ public class DataContext {
             }
 
             rset.close();
+            stmt.close();
         }
 
         return retVal;
@@ -572,6 +622,7 @@ public class DataContext {
                 retVal.add(st);
             }
             rset.close();
+            stmt.close();
         }
 
         return retVal;
@@ -635,7 +686,10 @@ public class DataContext {
                 retVal.add(rset.getDouble(1));
             }
             rset.close();
+            
         }
+
+        stmt.close();
 
         return retVal;
     }
@@ -690,6 +744,7 @@ public class DataContext {
                 retVal.add(rset.getDouble(1));
             }
             rset.close();
+            stmt.close();
         }
         //System.out.println("Result: " + retVal.size());
         return retVal;
@@ -731,6 +786,7 @@ public class DataContext {
                 products.add(p);
             }
             rset.close();
+            stmt.close();
         }
 
         return products;
@@ -786,6 +842,9 @@ public class DataContext {
             while (rset.next()) {
                 retVal.add(rset.getString("DM"));
             }
+            
+            rset.close();
+            stmt.close();
         }
 
         return retVal;
@@ -885,6 +944,9 @@ public class DataContext {
                 st.setHumidity(rset.getFloat("HUMIDITY"));
                 retVal.add(st);
             }
+            
+            rset.close();
+            stmt.close();
         }
 
         return retVal;
@@ -925,6 +987,9 @@ public class DataContext {
             if (rset.next()) {
                 retVal = rset.getFloat("DV");
             }
+            
+            rset.close();
+            stmt.close();
         }
 
         return retVal;
@@ -973,6 +1038,9 @@ public class DataContext {
             if (rset.next()) {
                 retVal = rset.getFloat("DV");
             }
+            
+            rset.close();
+            stmt.close();
         }
 
         return retVal;
@@ -1010,6 +1078,9 @@ public class DataContext {
                     retVal.add(rd);
                 }
             }
+            
+            rset.close();
+            stmt.close();
         }
 
         return retVal;
@@ -1048,6 +1119,9 @@ public class DataContext {
                     retVal.add(rd);
                 }
             }
+            
+            rset.close();
+            stmt.close();
         }
 
         return retVal;
@@ -1118,6 +1192,7 @@ public class DataContext {
                 retVal.add(pp);
             }
             rset.close();
+            stmt.close();
         }
 
         return retVal;
@@ -1150,6 +1225,9 @@ public class DataContext {
                 productPassport.setShrinkage(rset.getFloat("SHRINKAGE"));
                 productPassport.setActivity(rset.getString("ACTIVITY"));
             }
+            
+            rset.close();
+            stmt.close();
         }
 
         return productPassport;
@@ -1194,6 +1272,7 @@ public class DataContext {
                 }
 
                 rset.close();
+                stmt.close();
                 return id;
             }
 
@@ -1214,7 +1293,7 @@ public class DataContext {
             Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
             stmt.execute(query);
-
+            stmt.close();
             return pp.getId();
         }
     }
@@ -1235,6 +1314,7 @@ public class DataContext {
         Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
         stmt.executeUpdate(query);
+        stmt.close();
     }
     //</editor-fold>
 
@@ -1423,6 +1503,9 @@ public class DataContext {
             //Сохраняем код продукции и плотность.
             currentDensity = density;
             currentProductId = productId;
+            
+            rset.close();
+            stmt.close();
         }
 
         return density;
@@ -1436,7 +1519,7 @@ public class DataContext {
      */
     public ArrayList<DefectType> getDefectTypes() throws SQLException {
         ArrayList<DefectType> retVal = new ArrayList<>();
-        
+
         if (connection == null) {
             return retVal;
         }
@@ -1463,7 +1546,7 @@ public class DataContext {
         }
 
         stmt.close();
-        
+
         defectTypes = retVal;
         return retVal;
     }
